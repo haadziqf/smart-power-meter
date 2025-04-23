@@ -40,12 +40,11 @@ A sleek, modern WiFi configuration manager for ESP8266 devices with an iOS-inspi
 
 ### Main Interface (Desktop)
 
-![Main Interface Desktop](docs/screenshots/main interface (dekstop).png)
+![Main Interface Desktop](docs/screenshots/main%20interface%20(dekstop).png)
 
 ### Main Interface (Phone)
 
-![Main Interface Phone](docs/screenshots/main%20interface%20(phone).png)https://github.com/haadziqf/wifi-manager/blob/main/docs/screenshots/main%20interface%20(phone).png?raw=true
-
+![Main Interface Phone](docs/screenshots/main%20interface%20(phone).png)
 ### Demo Video
 
 <video src="docs/screenshots/demo.webm" controls width="400"></video>
