@@ -44,7 +44,7 @@ A sleek, modern WiFi configuration manager for ESP8266 devices with an iOS-inspi
 
 ### Main Interface (Phone)
 
-![Main Interface Phone](docs/screenshots/main interface (phone).png)https://github.com/haadziqf/wifi-manager/blob/main/docs/screenshots/main%20interface%20(phone).png?raw=true
+![Main Interface Phone](docs/screenshots/main%20interface%20(phone).png)https://github.com/haadziqf/wifi-manager/blob/main/docs/screenshots/main%20interface%20(phone).png?raw=true
 
 ### Demo Video
 
