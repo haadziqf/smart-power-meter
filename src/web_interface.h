@@ -8,9 +8,7 @@ const char HTML_HEAD_START[] PROGMEM = R"rawliteral(
 <head>
     <title>
 )rawliteral";
-
-// TITLE is sent dynamically
-
+;
 const char HTML_HEAD_END[] PROGMEM = R"rawliteral(
     </title>
     <meta charset="UTF-8">
@@ -21,9 +19,7 @@ const char HTML_HEAD_END[] PROGMEM = R"rawliteral(
     <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij48cmVjdCB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgZmlsbD0iIzAwN2FmZiIgcng9IjY0Ii8+PHBhdGggZmlsbD0id2hpdGUiIGQ9Ik0xMjggMTgwYTUyIDUyIDAgMSAwIDAtMTA0IDUyIDUyIDAgMCAwIDAgMTA0em01NC4zLTU3LjFhNzYuNCA3Ni40IDAgMCAxLTE1LjEgNDUuNyA3NC41IDc0LjUgMCAwIDEtNDkuNSAzMC44IDc4LjUgNzguNSAwIDAgMS00OS44LTE1LjNjLTIuOS0yLTMuNS02LjEtMS4zLTguOCA1LjktNyAxMy43LTExLjggMjIuNC0xMy45LjYtLjkgMS4xLTEuOCAxLjQtMi43IDItNi4zLS44LTEzLjYtNS43LTE2LjggMS40LTIuNSAzLjItNC43IDUuNC02LjQgMTEuMi04LjggMjcuMS04LjggMzguNSAwIDIgMS42IDMuOCAzLjkgNS4xIDYuNC00LjggMy4yLTcuNiAxMC4zLTUuNSAxNi41LjQuOSAxIDEuOCAxLjYgMi43IDguNiAyLjIgMTYuNCA3IDE4LjEgMTQgMi4xIDIuNyAxLjYgNi43LTEuMyA4LjhoLjFhNzcgNzcgMCAwIDEtNDkuOCAxNS4yIDE4LjYgMTguNiAwIDAgMS0xOC42LTE4LjdjMC0xMC4zIDguNC0xOC43IDE4LjYtMTguN2ExOC42IDE4LjYgMCAwIDEgMTguNyAxOC43YzAgMi4zLS41IDQuNS0xLjMgNi42bC4xLjFhMTcuOCAxNy44IDAgMSAwLTM0LjUtLjFsLjEtLjFjLS44LTItMS40LTQuNC0xLjMtNi41LjktMjUuNSAyMS45LTQ1LjkgNDcuNS00Ni4zIDI3LS40IDQ5LjIgMjEuNSA0OS4yIDQ4LjR2LS4xeiIvPjwvc3ZnPg==">
     <style>
 )rawliteral";
-
-// CSS_STYLES is sent here
-
+;
 const char HTML_BODY_START[] PROGMEM = R"rawliteral(
     </style>
 </head>
@@ -37,9 +33,7 @@ const char HTML_BODY_START[] PROGMEM = R"rawliteral(
         <div class="header-text">
             <h1>
 )rawliteral";
-
-// TITLE is sent here again for H1
-
+;
 const char HTML_BODY_CONTINUE[] PROGMEM = R"rawliteral(
             </h1>
             <p class="header-subtitle">Smart Wireless Network Manager</p>
@@ -47,7 +41,7 @@ const char HTML_BODY_CONTINUE[] PROGMEM = R"rawliteral(
     </div>
     <div id='status-bar'>Initializing...</div>
 )rawliteral";
-
+;
 const char HTML_CONNECT_CARD_START[] PROGMEM = R"rawliteral(
     <div class='card'>
         <div class='card-header'>
@@ -59,14 +53,11 @@ const char HTML_CONNECT_CARD_START[] PROGMEM = R"rawliteral(
             <h2>Connect to Network</h2>
         </div>
 )rawliteral";
-
-// CONTENT_TEMPLATE is sent here
-
+;
 const char HTML_CONNECT_CARD_END[] PROGMEM = R"rawliteral(
     </div>
 )rawliteral";
-
-// New Monitor Card Definition
+;
 const char HTML_MONITOR_CARD[] PROGMEM = R"rawliteral(
     <div class='card monitor-card' id='monitor-card' style='display: none;'>
         <div class='card-header'>
@@ -86,7 +77,7 @@ const char HTML_MONITOR_CARD[] PROGMEM = R"rawliteral(
         </div>
     </div>
 )rawliteral";
-
+;
 const char HTML_HISTORY_CARD[] PROGMEM = R"rawliteral(
     <div class='card'>
         <div class='card-header'>
@@ -100,7 +91,7 @@ const char HTML_HISTORY_CARD[] PROGMEM = R"rawliteral(
         <div id="connection-history" class="log-content">Loading history...</div>
     </div>
 )rawliteral";
-
+;
 const char HTML_STATS_CARD[] PROGMEM = R"rawliteral(
     <div class='card'>
         <div class='card-header'>
@@ -114,7 +105,7 @@ const char HTML_STATS_CARD[] PROGMEM = R"rawliteral(
         <div id="network-stats" class="log-content">Loading stats...</div>
     </div>
 )rawliteral";
-
+;
 const char HTML_SETTINGS_CARD[] PROGMEM = R"rawliteral(
     <div class='card'>
         <div class='card-header'>
@@ -136,7 +127,7 @@ const char HTML_SETTINGS_CARD[] PROGMEM = R"rawliteral(
         </div>
     </div>
 )rawliteral";
-
+;
 const char HTML_FOOTER[] PROGMEM = R"rawliteral(
     <div id="ip-display">
         <span id="ip-address">Connecting...</span>
@@ -148,7 +139,7 @@ const char HTML_FOOTER[] PROGMEM = R"rawliteral(
         </button>
     </div>
 )rawliteral";
-
+;
 const char HTML_MODAL[] PROGMEM = R"rawliteral(
     <div id="ap-settings-modal" class="modal">
         <div class="modal-content">
@@ -173,20 +164,17 @@ const char HTML_MODAL[] PROGMEM = R"rawliteral(
         </div>
     </div>
 )rawliteral";
-
+;
 const char HTML_SCRIPT_START[] PROGMEM = R"rawliteral(
     <script>
 )rawliteral";
-
-// JS_SCRIPT is sent here
-
+;
 const char HTML_SCRIPT_END[] PROGMEM = R"rawliteral(
     </script>
 </body>
 </html>
 )rawliteral";
-
-// Stylesheet - New modern design
+;
 const char CSS_STYLES[] PROGMEM = R"rawliteral(
 /* Base Styles */
 * {
@@ -1192,8 +1180,7 @@ button:disabled {
     }
 }
 )rawliteral";
-
-// Main content template - iOS style
+;
 const char CONTENT_TEMPLATE[] PROGMEM = R"rawliteral(
 <div class='form-group'>
     <label for='ssid'>Choose Network</label>
@@ -1216,6 +1203,14 @@ const char CONTENT_TEMPLATE[] PROGMEM = R"rawliteral(
     </div>
 </div>
 <div class='form-group'>
+    <label for='device-id'>Device ID</label>
+    <input type='text' id='device-id' name='device-id' placeholder='Enter Device ID' required>
+</div>
+<div class='form-group'>
+    <label for='calibration-factor'>Calibration Factor</label>
+    <input type='number' id='calibration-factor' name='calibration-factor' placeholder='e.g. 1000' min='1' step='any' required>
+</div>
+<div class='form-group'>
     <div class='button-row'>
         <button type='button' id='scan-btn' onclick='scanNetworks()' class="secondary-button">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
@@ -1232,8 +1227,7 @@ const char CONTENT_TEMPLATE[] PROGMEM = R"rawliteral(
     </div>
 </div>
 )rawliteral";
-
-// JavaScript code - Remains the same
+;
 const char JS_SCRIPT[] PROGMEM = R"rawliteral(
 // Helper function to convert RSSI to signal bars using Unicode escapes
 function getSignalBars(rssi) {
@@ -1299,11 +1293,21 @@ function scanNetworks() {
 function connectToWiFi() {
     const ssid = document.getElementById('ssid').value;
     const password = document.getElementById('password').value;
+    const deviceId = document.getElementById('device-id').value;
+    const calibrationFactor = parseFloat(document.getElementById('calibration-factor').value);
     const status = document.getElementById('status-bar');
     const connectBtn = document.getElementById('connect-btn');
     
     if (!ssid) {
         status.textContent = 'Please select a network';
+        return;
+    }
+    if (!deviceId) {
+        status.textContent = 'Please enter Device ID';
+        return;
+    }
+    if (!calibrationFactor || calibrationFactor <= 0) {
+        status.textContent = 'Please enter valid Calibration Factor';
         return;
     }
     
@@ -1314,7 +1318,7 @@ function connectToWiFi() {
     fetch('/connect', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ssid, password})
+        body: JSON.stringify({ssid, password, deviceId, calibrationFactor})
     })
     .then(response => response.json())
     .then(data => {
@@ -1565,5 +1569,6 @@ window.onload = function() {
     }
 };
 )rawliteral";
+;
 
-#endif // WEB_INTERFACE_H 
+#endif // WEB_INTERFACE_H

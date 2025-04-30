@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Power Meter - Dashboard (MVP)</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Light Theme (Default) */
+            --primary: #6C5CE7;
+            --secondary: #00B894;
+            --text-color: #2D3436;
+            --text-muted-color: #636e72;
+            --bg-color: #F1F2F6;
+            --card-bg: #FFFFFF;
+            --border-color: #dfe6e9;
+            --sidebar-width: 260px;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --border-radius: 0.75rem;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --chart-grid-color: rgba(0, 0, 0, 0.05);
+            --chart-tick-color: #6c757d;
+
+            /* Dark Theme Colors */
+            --bg-color-dark: #212529;
+            --card-bg-dark: #2b3035;
+            --text-color-dark: #f8f9fa;
+            --text-muted-color-dark: #adb5bd;
+            --border-color-dark: #495057;
+            --chart-grid-color-dark: rgba(255, 255, 255, 0.1);
+            --chart-tick-color-dark: #adb5bd;
+        }
+
+        /* Apply dark theme variables */
+        [data-bs-theme="dark"] {
+            --bg-color: var(--bg-color-dark);
+            --card-bg: var(--card-bg-dark);
+            --text-color: var(--text-color-dark);
+            --text-muted-color: var(--text-muted-color-dark);
+            --border-color: var(--border-color-dark);
+            --chart-grid-color: var(--chart-grid-color-dark);
+            --chart-tick-color: var(--chart-tick-color-dark);
+
+            /* Component specific overrides for dark mode */
+            .table {
+                --bs-table-color: var(--text-color-dark);
+                --bs-table-border-color: var(--border-color-dark);
+                --bs-table-hover-bg: rgba(255, 255, 255, 0.075);
+            }
+            .alert-secondary {
+                 background-color: #343a40; /* Example override */
+                 border-color: #495057;
+                 color: var(--text-color-dark);
+            }
+            .text-muted {
+                color: var(--text-muted-color) !important; /* Use important if needed */
+            }
+            .form-control {
+                 background-color: var(--card-bg-dark);
+                 color: var(--text-color-dark);
+                 border-color: var(--border-color-dark);
+             }
+             .form-control:focus {
+                 background-color: var(--card-bg-dark);
+                 color: var(--text-color-dark);
+                 border-color: var(--primary);
+                 box-shadow: 0 0 0 0.25rem rgba(108, 92, 231, 0.5); /* Primary color shadow */
+             }
+             .modal-content {
+                 background-color: var(--card-bg-dark);
+                 color: var(--text-color-dark);
+             }
+             .modal-header {
+                 border-bottom-color: var(--border-color-dark);
+             }
+             .modal-footer {
+                 border-top-color: var(--border-color-dark);
+             }
+             .btn-close {
+                 filter: invert(1) grayscale(100%) brightness(200%);
+             }
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            box-shadow: var(--shadow);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .sidebar-brand {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #sidebar .nav-link {
+            color: var(--text-color);
+            padding: 0.75rem var(--spacing-md);
+            margin-bottom: 0.5rem;
+            border-radius: 0.375rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+        #sidebar .nav-link.active,
+        #sidebar .nav-link:hover {
+            background-color: rgba(108, 92, 231, 0.1);
+            color: var(--primary);
+        }
+        #sidebar .nav-link i {
+            width: 1.25rem;
+            text-align: center;
+            opacity: 0.8;
+        }
+
+        #logoutBtn {
+            margin-top: auto;
+            color: #e17055; /* Danger color */
+        }
+         #logoutBtn:hover {
+             background-color: rgba(225, 112, 85, 0.1);
+         }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            padding: var(--spacing-lg);
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            margin-bottom: var(--spacing-lg);
+            border-color: var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--spacing-md) var(--spacing-lg);
+            font-weight: 600;
+            transition: border-color 0.3s;
+        }
+        .card-body {
+            padding: var(--spacing-lg);
+        }
+
+        .stat-card {
+            text-align: center;
+        }
+        .stat-card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .stat-card .label {
+            font-size: 0.8rem;
+            color: var(--text-muted-color);
+            text-transform: uppercase;
+            margin-top: 0.25rem;
+            transition: color 0.3s;
+        }
+
+        /* Responsive Table Fix */
+        .table th, .table td {
+             vertical-align: middle;
+        }
+        @media (max-width: 767.98px) {
+            .table th,
+            .table td {
+                padding: 0.6rem 0.4rem;
+                font-size: 0.85rem;
+            }
+            #recentReadingsTableBody td:first-child {
+                max-width: 100px; /* Adjust as needed */
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            .table-responsive { /* Ensure responsiveness */
+                 width: 100%;
+                 overflow-x: auto;
+                 -webkit-overflow-scrolling: touch;
+             }
+             /* Hide sidebar on small screens initially */
+             #sidebar {
+                 transform: translateX(-100%);
+                 transition: transform 0.3s ease;
+                 z-index: 1040; /* Ensure it's above content */
+             }
+             #sidebar.show {
+                 transform: translateX(0);
+             }
+             .main-content {
+                 margin-left: 0;
+             }
+             #sidebarToggle {
+                 display: block !important; /* Show toggle button */
+             }
+        }
+
+        /* Status Message */
+        #statusContainer {
+            position: fixed;
+            bottom: 1rem;
+            left: 1rem;
+            z-index: 1050;
+            min-width: 250px;
+        }
+
+        /* Sidebar Toggle Button */
+        #sidebarToggle {
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1041; /* Above sidebar */
+            display: none; /* Hidden by default on larger screens */
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar Toggle Button (for Mobile) -->
+    <button id="sidebarToggle" class="btn btn-primary d-md-none">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <h5 class="sidebar-brand">
+            <i class="fas fa-bolt"></i>
+            <span>Power Meter</span>
+        </h5>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="#dashboard-content" data-bs-toggle="tab" data-bs-target="#dashboard-content">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#devices-content" data-bs-toggle="tab" data-bs-target="#devices-content">
+                    <i class="fas fa-plug"></i>
+                    <span>Devices</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#settings-content" data-bs-toggle="tab" data-bs-target="#settings-content">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#reports-content" data-bs-toggle="tab" data-bs-target="#reports-content">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            <!-- Add other links later if needed -->
+        </ul>
+
+        <!-- Dark Mode Toggle -->
+        <div class="mt-auto pt-3 border-top">
+             <div class="form-check form-switch">
+                 <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch">
+                 <label class="form-check-label" for="darkModeSwitch">Dark Mode</label>
+             </div>
+         </div>
+
+        <a class="nav-link mt-2" href="#" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Tab Content -->
+        <div class="tab-content" id="mainTabContent">
+
+            <!-- Dashboard Tab Pane -->
+            <div class="tab-pane fade show active" id="dashboard-content" role="tabpanel" aria-labelledby="dashboard-tab-link">
+                <div class="page-header">
+                    <h1>Dashboard</h1>
+                </div>
+
+                <!-- Status Message Area -->
+                <div id="statusContainer" class="d-none">
+                    <div class="alert alert-info d-flex align-items-center shadow-sm" role="alert">
+                        <i class="fas fa-spinner fa-spin me-2"></i>
+                        <div id="statusMessage">Loading...</div>
+                    </div>
+                </div>
+
+                <!-- Stat Cards (MVP) -->
+                <div class="row mb-3">
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body stat-card">
+                                <div class="value" id="statTotalKwh">--</div>
+                                <div class="label">Total kWh (24h)</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100">
+                            <div class="card-body stat-card">
+                                <div class="value" id="statActiveDevices">--</div>
+                                <div class="label">Active Devices</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Consumption Chart (MVP) -->
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span>Power Consumption (Last 24h)</span>
+                         <!-- Add range buttons later if needed -->
+                    </div>
+                    <div class="card-body">
+                        <div style="height: 280px;">
+                            <canvas id="consumptionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Readings Table (MVP) -->
+                <div class="card">
+                    <div class="card-header">
+                        Recent Readings
+                    </div>
+                    <div class="card-body p-0"> <!-- Remove padding for full-width table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Device</th>
+                                        <th>Location</th>
+                                        <th>kWh</th>
+                                        <th>Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentReadingsTableBody">
+                                    <tr>
+                                        <td colspan="4" class="text-center p-5 text-muted">Loading readings...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Pagination Controls -->
+                        <nav aria-label="Readings pagination">
+                            <div id="readingsPagination" class="mt-3 d-flex justify-content-center"></div> <!-- Added d-flex justify-content-center -->
+                        </nav>
+                    </div>
+                </div>
+
+                <!-- Active Alerts Card -->
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-exclamation-triangle me-2 text-danger"></i> Active Alerts
+                    </div>
+                    <div class="card-body" id="activeAlertsContainer">
+                        <p class="text-center text-muted p-3">Loading alerts...</p>
+                    </div>
+                </div>
+
+            </div> <!-- /#dashboard-content -->
+
+            <!-- Devices Tab Pane -->
+            <div class="tab-pane fade" id="devices-content" role="tabpanel" aria-labelledby="devices-tab-link">
+                <div class="page-header d-flex justify-content-between align-items-center">
+                    <h1>Device Management</h1>
+                    <button class="btn btn-success" id="addDeviceBtn" data-bs-toggle="modal" data-bs-target="#addDeviceModal">
+                        <i class="fas fa-plus me-1"></i> Add Device
+                    </button>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        Registered Devices
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="devicesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Device ID</th>
+                                        <th>Name</th>
+                                        <th>Location</th>
+                                        <th>Last Reading</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="devicesTableBody">
+                                    <tr>
+                                        <td colspan="5" class="text-center p-5 text-muted">Loading devices...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- /#devices-content -->
+
+            <!-- Settings Tab Pane -->
+            <div class="tab-pane fade" id="settings-content" role="tabpanel" aria-labelledby="settings-tab-link">
+                <div class="page-header">
+                    <h1>Settings</h1>
+                </div>
+                <div class="card">
+                    <div class="card-header">User Preferences</div>
+                    <div class="card-body">
+                        <form id="settingsForm">
+                            <div class="mb-3">
+                                <label for="alertThreshold" class="form-label">Alert Threshold (kWh)</label>
+                                <input type="number" step="0.1" class="form-control" id="alertThreshold" placeholder="e.g., 5.0">
+                                <div class="form-text">Set consumption level (kWh) to trigger an alert (feature coming soon).</div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="updateInterval" class="form-label">Update Interval (minutes)</label>
+                                <input type="number" min="1" step="1" class="form-control" id="updateInterval" placeholder="e.g., 5">
+                                <div class="form-text">How often dashboard auto-refreshes (feature coming soon).</div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
+                        </form>
+                    </div>
+                </div>
+            </div> <!-- /#settings-content -->
+
+            <!-- Reports Tab Pane -->
+            <div class="tab-pane fade" id="reports-content" role="tabpanel" aria-labelledby="reports-tab-link">
+                <div class="page-header">
+                    <h1>Reports</h1>
+                </div>
+
+                <div class="card mb-4">
+                    <div class="card-header">Generate Consumption Report</div>
+                    <div class="card-body">
+                        <div class="row g-3 align-items-end">
+                            <div class="col-md-4">
+                                <label for="reportStartDate" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="reportStartDate">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="reportEndDate" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="reportEndDate">
+                            </div>
+                            <div class="col-md-auto">
+                                <button class="btn btn-primary w-100" id="generateReportBtn">
+                                    <i class="fas fa-paper-plane me-1"></i> Generate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Report Results</div>
+                    <div class="card-body">
+                         <div id="reportChartStatus" class="text-center text-muted p-4 d-none">
+                             <!-- Status message like loading or no data -->
+                         </div>
+                         <div style="height: 350px;">
+                             <canvas id="reportChartCanvas"></canvas>
+                         </div>
+                    </div>
+                </div>
+            </div> <!-- /#reports-content -->
+
+        </div> <!-- /.tab-content -->
+    </div> <!-- /main-content -->
+
+    <!-- Modals -->
+
+    <!-- Add Device Modal -->
+    <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDeviceModalLabel">Add New Device</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDeviceForm">
+                        <div class="mb-3">
+                            <label for="newDeviceName" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="newDeviceName" required>
+                            <div class="form-text">A descriptive name (e.g., "Living Room Meter").</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newDeviceLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="newDeviceLocation">
+                            <div class="form-text">Optional location description (e.g., "Basement Panel").</div>
+                        </div>
+                         <div class="mb-3">
+                            <label for="newDeviceCalibration" class="form-label">Calibration Factor</label>
+                            <input type="number" step="0.01" class="form-control" id="newDeviceCalibration" value="1.00" min="0">
+                            <div class="form-text">Optional calibration factor (default is 1.00).</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="saveNewDeviceBtn">Save Device</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Device Modal -->
+    <div class="modal fade" id="editDeviceModal" tabindex="-1" aria-labelledby="editDeviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDeviceModalLabel">Edit Device</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDeviceForm">
+                        <input type="hidden" id="editDeviceIdInternal"> <!-- Hidden field for UUID -->
+                        <div class="mb-3">
+                            <label for="editDeviceTextId" class="form-label">Device ID</label>
+                            <input type="text" class="form-control" id="editDeviceTextId" readonly disabled>
+                            <div class="form-text">Device ID cannot be changed.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDeviceName" class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="editDeviceName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDeviceLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="editDeviceLocation">
+                        </div>
+                         <div class="mb-3">
+                            <label for="editDeviceCalibration" class="form-label">Calibration Factor</label>
+                            <input type="number" step="0.01" class="form-control" id="editDeviceCalibration" value="1.00" min="0" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="updateDeviceBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Device Confirmation Modal -->
+    <div class="modal fade" id="deleteDeviceModal" tabindex="-1" aria-labelledby="deleteDeviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                 <div class="modal-header border-0">
+                    <h5 class="modal-title" id="deleteDeviceModalLabel">Confirm Deletion</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <i class="fas fa-exclamation-triangle fa-3x text-danger mb-3"></i>
+                    <p>Delete device <strong id="deleteDeviceName"></strong>?</p>
+                    <p class="text-muted small">This action cannot be undone.</p>
+                    <input type="hidden" id="deleteDeviceId">
+                </div>
+                <div class="modal-footer border-0 justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+
+    <script>
+        // --- Configuration ---
+        const SUPABASE_URL = 'https://juciywnevycylsnqnbmq.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1Y2l5d25ldnljeWxzbnFuYm1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU0NTY3NjAsImV4cCI6MjA2MTAzMjc2MH0.jam9COWAITe4d1bYSuIyIp7ii-3R8_SlKoTIO5lwwjQ';
+        const READINGS_LIMIT = 15; // How many readings to show in the table
+
+        // --- Supabase Client ---
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // --- Global Variables ---
+        let consumptionChart = null;
+        let reportChartInstance = null;
+        let readingsSubscription = null;
+        const prefersDarkScheme = window.matchMedia("(prefers-color-scheme: dark)");
+
+        // --- Readings Pagination State ---
+        let readingsCurrentPage = 1;
+        const readingsPageSize = 10; // Jumlah item per halaman
+        let readingsTotalCount = 0;
+        let readingsIsLoading = false;
+
+        // --- Helper Functions ---
+        function showStatus(message, type = 'info') {
+            const statusContainer = document.getElementById('statusContainer');
+            const statusMessageEl = document.getElementById('statusMessage');
+            const alertDiv = statusContainer ? statusContainer.querySelector('.alert') : null;
+            const iconEl = alertDiv ? alertDiv.querySelector('i') : null;
+
+            if (!statusContainer || !statusMessageEl || !alertDiv || !iconEl) return;
+
+            // Set message
+            statusMessageEl.textContent = message;
+
+            // Set style
+            alertDiv.className = 'alert d-flex align-items-center shadow-sm'; // Reset
+            iconEl.className = 'fas me-2'; // Reset
+            if (type === 'error') {
+                alertDiv.classList.add('alert-danger');
+                iconEl.classList.add('fa-exclamation-circle');
+            } else if (type === 'success') {
+                 alertDiv.classList.add('alert-success');
+                 iconEl.classList.add('fa-check-circle');
+            } else { // Info or loading
+                alertDiv.classList.add('alert-info');
+                iconEl.classList.add('fa-spinner', 'fa-spin');
+            }
+
+            statusContainer.classList.remove('d-none');
+        }
+
+        function hideStatus() {
+            const statusContainer = document.getElementById('statusContainer');
+            if (statusContainer) {
+                statusContainer.classList.add('d-none');
+            }
+        }
+
+        // --- Theme Management ---
+        function applyTheme(theme) {
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+            }
+            // Update toggle state if it exists
+            const darkModeSwitch = document.getElementById('darkModeSwitch');
+            if (darkModeSwitch) {
+                darkModeSwitch.checked = (theme === 'dark');
+            }
+            updateChartThemes(); // Update chart colors
+        }
+
+        function toggleTheme() {
+            const currentTheme = localStorage.getItem('theme') || (prefersDarkScheme.matches ? 'dark' : 'light');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+            console.log(`Theme changed to: ${newTheme}`);
+        }
+
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemTheme = prefersDarkScheme.matches ? 'dark' : 'light';
+            applyTheme(savedTheme || systemTheme);
+            console.log(`Initialized theme: ${savedTheme || systemTheme}`);
+
+            // Optional: Listen for system theme changes
+            prefersDarkScheme.addEventListener('change', (e) => {
+                // Only change if no theme explicitly saved by user
+                if (!localStorage.getItem('theme')) {
+                    applyTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        }
+
+        // Function to update chart colors based on current theme
+        function updateChartThemes() {
+            const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid-color').trim();
+            const tickColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-tick-color').trim();
+            const textColor = getComputedStyle(document.documentElement).getPropertyValue('--text-color').trim();
+
+            // Update Chart.js defaults (if needed, or update instances directly)
+            Chart.defaults.borderColor = gridColor;
+            Chart.defaults.color = textColor;
+            if (Chart.defaults.scale) { // Check if scale options exist
+                 Chart.defaults.scale.grid.color = gridColor;
+                 Chart.defaults.scale.grid.borderColor = gridColor; // Also set border color
+                 Chart.defaults.scale.ticks.color = tickColor;
+            }
+
+            // Update existing chart instances
+            if (consumptionChart) {
+                try {
+                    // Update colors directly on the specific chart instance
+                    consumptionChart.options.scales.x.grid.color = gridColor;
+                    consumptionChart.options.scales.x.ticks.color = tickColor;
+                    consumptionChart.options.scales.y.grid.color = gridColor;
+                    consumptionChart.options.scales.y.ticks.color = tickColor;
+                    consumptionChart.options.plugins.tooltip.backgroundColor = isDark ? '#2b3035' : '#FFFFFF'; // Example tooltip bg
+                    consumptionChart.options.plugins.tooltip.titleColor = textColor;
+                    consumptionChart.options.plugins.tooltip.bodyColor = textColor;
+
+                    consumptionChart.update();
+                    console.log('Consumption chart theme updated.');
+                } catch (e) {
+                    console.error("Error updating consumption chart theme:", e);
+                }
+            }
+            if (reportChartInstance) {
+                try {
+                    // Update colors directly on the report chart instance
+                    reportChartInstance.options.scales.x.grid.color = gridColor;
+                    reportChartInstance.options.scales.x.ticks.color = tickColor;
+                    reportChartInstance.options.scales.y.grid.color = gridColor;
+                    reportChartInstance.options.scales.y.ticks.color = tickColor;
+                    reportChartInstance.options.plugins.tooltip.backgroundColor = isDark ? '#2b3035' : '#FFFFFF';
+                    reportChartInstance.options.plugins.tooltip.titleColor = textColor;
+                    reportChartInstance.options.plugins.tooltip.bodyColor = textColor;
+
+                    // Update dataset colors if needed (example for bar chart)
+                    if(reportChartInstance.data.datasets[0]) {
+                        reportChartInstance.data.datasets[0].backgroundColor = isDark ? 'rgba(0, 184, 148, 0.7)' : 'rgba(0, 184, 148, 0.6)';
+                        reportChartInstance.data.datasets[0].borderColor = isDark ? 'rgba(0, 184, 148, 1)' : 'rgba(0, 184, 148, 1)';
+                    }
+
+                    reportChartInstance.update();
+                    console.log('Report chart theme updated.');
+                } catch (e) {
+                    console.error("Error updating report chart theme:", e);
+                }
+            }
+        }
+
+        // --- Core Functions ---
+        async function checkUserLogin() {
+            console.log('Checking user login...');
+            showStatus('Authenticating...');
+            try {
+                const { data: { session }, error } = await supabaseClient.auth.getSession();
+                if (error) throw error;
+                if (!session) {
+                    console.log('No session, redirecting to login.');
+                    window.location.href = 'login.html'; // Redirect to your login page
+                } else {
+                    console.log('User session found:', session.user.id);
+                    hideStatus(); // Hide auth status
+                    loadDashboardData(); // Load initial dashboard data
+                    loadDevicesList(); // Load devices list initially
+                    loadUserSettings(); // Load user settings
+                    setupRealtimeSubscriptions(); // Setup listeners
+                }
+            } catch (error) {
+                console.error('Error checking user session:', error);
+                showStatus('Authentication failed', 'error');
+                // Optional: redirect to login after a delay or show a message
+                // window.location.href = 'login.html';
+            }
+        }
+
+        async function handleLogout() {
+            console.log('Logging out...');
+            showStatus('Logging out...');
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) throw error;
+                window.location.href = 'login.html'; // Redirect after successful logout
+            } catch (error) {
+                console.error('Error signing out:', error);
+                showStatus('Logout failed', 'error');
+            }
+        }
+
+        async function loadDashboardData() {
+            console.log('Loading dashboard data...');
+            showStatus('Loading dashboard data...');
+
+            try {
+                // Get user ID (should be available after checkUserLogin)
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error("User not found after login check.");
+
+                 // Calculate start time for 24h ago
+                 const startTime = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+                // Fetch data in parallel using supabaseClient
+                const [devicesRes, readingsRes, alertsRes] = await Promise.all([
+                    // Query 1: Get device count for the user
+                    supabaseClient.from('devices')
+                        .select('id', { count: 'exact', head: true })
+                        .eq('user_id', user.id),
+
+                    // Query 2: Get readings from the last 24h for devices belonging to the user
+                    supabaseClient.from('readings')
+                        .select('kwh_value, timestamp, devices!inner ( id, name, location )')
+                        .eq('devices.user_id', user.id)
+                        .gte('timestamp', startTime)
+                        .order('timestamp', { ascending: false })
+                        .limit(READINGS_LIMIT * 2),
+
+                    // Query 3: Get active alerts for the user (assuming filter via devices)
+                    supabaseClient.from('alerts')
+                        .select('id, message, created_at, devices!inner ( name ) ') // Select needed fields, REMOVED severity
+                        .eq('status', 'active')
+                        .eq('devices.user_id', user.id)
+                        .order('created_at', { ascending: false })
+                        // .limit(5) // Optional: Limit number of alerts shown
+                ]);
+
+                // Error checking
+                if (devicesRes.error) throw devicesRes.error;
+                if (readingsRes.error) throw readingsRes.error;
+                if (alertsRes.error) throw alertsRes.error; // Check alerts error
+
+                // Extract data (handle potential nulls)
+                const deviceCount = devicesRes.count ?? 0;
+                const recentReadings = readingsRes.data ?? [];
+                const alerts = alertsRes.data ?? []; // Extract alerts data
+
+                 console.log(`Fetched count: ${deviceCount} devices, ${recentReadings.length} recent readings, and ${alerts.length} active alerts.`);
+
+                // Update UI
+                updateStatCards(deviceCount, recentReadings); // Pass count and recentReadings
+                updateConsumptionChart(recentReadings); // Pass recentReadings for chart
+                loadReadingsData(readingsCurrentPage); // <<< ADD THIS LINE to load first page
+                updateAlertsList(alerts);
+
+                hideStatus();
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showStatus(`Error loading data: ${error.message}`, 'error');
+                // Clear potentially outdated data from UI on error
+                updateStatCards(0, []);
+                updateConsumptionChart([]);
+                // updateRecentReadingsTable([]); // Also remove this
+                // Clear pagination table as well
+                const readingsTableBody = document.getElementById('recentReadingsTableBody');
+                if(readingsTableBody) readingsTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Error loading data.</td></tr>`;
+            }
+        }
+
+        function updateStatCards(deviceCount, readings) {
+            try {
+                 // Active Devices (using count directly for MVP)
+                 const activeDevicesEl = document.getElementById('statActiveDevices');
+                 if (activeDevicesEl) activeDevicesEl.textContent = deviceCount;
+                 else console.warn('#statActiveDevices not found');
+
+                 // Total kWh (use the readings data already filtered for the last 24h)
+                 const totalKwh = readings.reduce((sum, r) => sum + (r.kwh_value || 0), 0);
+                 const totalKwhEl = document.getElementById('statTotalKwh');
+                 if (totalKwhEl) totalKwhEl.textContent = totalKwh.toFixed(2);
+                 else console.warn('#statTotalKwh not found');
+
+             } catch(error) {
+                 console.error("Error updating stat cards:", error);
+             }
+        }
+
+        function updateConsumptionChart(readings) {
+             try {
+                 const ctx = document.getElementById('consumptionChart');
+                 if (!ctx) return; // Element not found
+
+                 // Sort readings chronologically for the chart
+                 const sortedReadings = [...readings].sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+                 const labels = sortedReadings.map(r => new Date(r.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                 const data = sortedReadings.map(r => r.kwh_value || 0);
+
+                 // Destroy previous chart if exists
+                 if (consumptionChart) {
+                     consumptionChart.destroy();
+                 }
+
+                 // Create new chart
+                 consumptionChart = new Chart(ctx, {
+                     type: 'line',
+                     data: {
+                         labels: labels,
+                         datasets: [{
+                             label: 'kWh',
+                             data: data,
+                             borderColor: 'var(--primary)',
+                             backgroundColor: 'rgba(108, 92, 231, 0.1)',
+                             fill: true,
+                             tension: 0.3,
+                             pointRadius: 2, // Smaller points
+                             pointHoverRadius: 5
+                         }]
+                     },
+                     options: {
+                         responsive: true,
+                         maintainAspectRatio: false,
+                         plugins: {
+                             legend: { display: false }
+                         },
+                         scales: {
+                             y: { beginAtZero: true, ticks: { font: { size: 10 } } },
+                             x: { ticks: { font: { size: 10 }, maxRotation: 45, minRotation: 0, autoSkip: true, maxTicksLimit: 10 } } // Auto skip labels
+                         }
+                     }
+                 });
+
+                 // Apply theme colors AFTER chart is created/updated
+                 updateChartThemes();
+
+             } catch (error) {
+                 console.error("Error updating consumption chart:", error);
+                 showStatus('Chart update failed', 'error');
+             }
+        }
+
+        // Helper function to create device info map (needed for pagination)
+        function createDeviceInfoMap(devices) {
+            const deviceInfo = {};
+            if (devices && devices.length > 0) {
+                devices.forEach(device => {
+                    // Di MVP, kita tidak punya device_id text, jadi kita map by UUID (id)
+                    deviceInfo[device.id] = {
+                        name: device.name || 'Unknown Device',
+                        location: device.location || 'Unknown Location'
+                        // Add other fields if needed
+                    };
+                });
+            }
+            return deviceInfo;
+        }
+
+        // Load Readings Data with Pagination (for MVP)
+        async function loadReadingsData(page = 1) {
+            if (readingsIsLoading) return;
+            readingsIsLoading = true;
+            console.log(`MVP Dashboard: Loading readings data page ${page}`);
+            const readingsTableBody = document.getElementById('recentReadingsTableBody'); // Correct ID for MVP
+            const paginationContainer = document.getElementById('readingsPagination');
+
+            if (!readingsTableBody || !paginationContainer) {
+                console.error("Readings table body or pagination container not found in MVP");
+                readingsIsLoading = false;
+                return;
+            }
+
+            // Show loading state in table body (adjust colspan if needed)
+            readingsTableBody.innerHTML = `<tr><td colspan="4" class="text-center p-5 text-muted">Loading readings...</td></tr>`;
+            paginationContainer.innerHTML = ''; // Clear pagination while loading
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error("User not authenticated for readings");
+
+                const startIndex = (page - 1) * readingsPageSize;
+                const endIndex = startIndex + readingsPageSize - 1;
+
+                // Fetch readings for the current page and total count
+                // Need to join with devices to filter by user_id
+                const { data, error, count } = await supabaseClient
+                    .from('readings')
+                    .select(`
+                        timestamp,
+                        kwh_value,
+                        device_id, 
+                        devices!inner ( id, name, location )
+                    `, { count: 'exact' })
+                    .eq('devices.user_id', user.id) // Filter by logged-in user
+                    .order('timestamp', { ascending: false })
+                    .range(startIndex, endIndex);
+
+                if (error) {
+                    console.error("Error fetching paginated readings:", error);
+                    showStatus(`Error fetching readings: ${error.message}`, "error");
+                    readingsTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">Failed to load readings.</td></tr>`;
+                    readingsIsLoading = false;
+                    return;
+                }
+
+                console.log("MVP Dashboard: Paginated readings fetched:", data);
+                console.log("MVP Dashboard: Total readings count:", count);
+
+                readingsTotalCount = count || 0;
+                readingsCurrentPage = page;
+
+                // Generate device info map from the *joined* data if possible,
+                // otherwise fetch all devices again (less efficient but works)
+                let deviceInfo = {};
+                if(data && data.length > 0) {
+                    data.forEach(r => {
+                         if(r.devices && r.devices.id) {
+                             deviceInfo[r.device_id] = { name: r.devices.name, location: r.devices.location };
+                         }
+                    });
+                } else {
+                    // Fallback if no data on this page, fetch devices separately
+                     const { data: allDevices, error: devError } = await supabaseClient.from('devices').select('id, name, location').eq('user_id', user.id);
+                     if (!devError && allDevices) {
+                         deviceInfo = createDeviceInfoMap(allDevices); // Map by UUID
+                     }
+                }
+
+                displayReadingsTable(data || [], deviceInfo);
+                setupReadingsPagination();
+
+            } catch (err) {
+                console.error("Error in loadReadingsData (MVP):", err);
+                showStatus("An unexpected error occurred while loading readings.", "error");
+                readingsTableBody.innerHTML = `<tr><td colspan="4" class="text-center text-danger">An error occurred.</td></tr>`;
+            } finally {
+                readingsIsLoading = false;
+            }
+        }
+
+        // Display Readings Table (for MVP)
+        function displayReadingsTable(readings, deviceInfo) {
+            const readingsTableBody = document.getElementById('recentReadingsTableBody'); // Correct ID for MVP
+            if (!readingsTableBody) return;
+
+            readingsTableBody.innerHTML = ''; // Clear table
+
+            if (!readings || readings.length === 0) {
+                readingsTableBody.innerHTML = `<tr><td colspan="4" class="text-center p-5 text-muted">No reading data available.</td></tr>`;
+                return;
+            }
+
+            readings.forEach(reading => {
+                const row = document.createElement('tr');
+                // Use device info from the join or the map
+                const deviceName = reading.devices?.name || deviceInfo[reading.device_id]?.name || 'Unknown';
+                const location = reading.devices?.location || deviceInfo[reading.device_id]?.location || 'N/A';
+                let timestampStr = 'Invalid Date';
+                try {
+                    if (reading.timestamp) {
+                        const date = new Date(reading.timestamp);
+                        if (!isNaN(date)) {
+                            timestampStr = date.toLocaleString();
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error formatting date:", e, "Timestamp:", reading.timestamp);
+                }
+
+                // Columns for MVP table: Device, Location, kWh, Time
+                row.innerHTML = `
+                    <td>${deviceName}</td>
+                    <td>${location}</td>
+                    <td>${reading.kwh_value !== null ? reading.kwh_value.toFixed(2) : 'N/A'}</td>
+                    <td>${timestampStr}</td>
+                `;
+                readingsTableBody.appendChild(row);
+            });
+        }
+
+        // Setup Readings Pagination Controls (Generic)
+        function setupReadingsPagination() {
+            const paginationContainer = document.getElementById('readingsPagination');
+            if (!paginationContainer) return;
+
+            paginationContainer.innerHTML = ''; // Clear previous controls
+
+            const totalPages = Math.ceil(readingsTotalCount / readingsPageSize);
+
+            if (totalPages <= 1) {
+                return; // No pagination needed for 1 or 0 pages
+            }
+
+            const ul = document.createElement('ul');
+            ul.className = 'pagination justify-content-center'; // Center pagination
+
+            // Previous Button
+            const prevLi = document.createElement('li');
+            prevLi.className = `page-item ${readingsCurrentPage === 1 ? 'disabled' : ''}`;
+            const prevLink = document.createElement('a');
+            prevLink.className = 'page-link';
+            prevLink.href = '#';
+            prevLink.setAttribute('aria-label', 'Previous');
+            prevLink.innerHTML = '<span aria-hidden="true">&laquo;</span>'; // Use icon
+            prevLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (readingsCurrentPage > 1) {
+                    loadReadingsData(readingsCurrentPage - 1);
+                }
+            });
+            prevLi.appendChild(prevLink);
+            ul.appendChild(prevLi);
+
+            // Page Number Info (Simple: Page X of Y)
+            const pageInfoLi = document.createElement('li');
+            pageInfoLi.className = 'page-item disabled';
+            const pageInfoSpan = document.createElement('span');
+            pageInfoSpan.className = 'page-link';
+            pageInfoSpan.textContent = `Page ${readingsCurrentPage} of ${totalPages}`;
+            pageInfoLi.appendChild(pageInfoSpan);
+            ul.appendChild(pageInfoLi);
+
+            // Next Button
+            const nextLi = document.createElement('li');
+            nextLi.className = `page-item ${readingsCurrentPage === totalPages ? 'disabled' : ''}`;
+            const nextLink = document.createElement('a');
+            nextLink.className = 'page-link';
+            nextLink.href = '#';
+            nextLink.setAttribute('aria-label', 'Next');
+            nextLink.innerHTML = '<span aria-hidden="true">&raquo;</span>'; // Use icon
+            nextLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (readingsCurrentPage < totalPages) {
+                    loadReadingsData(readingsCurrentPage + 1);
+                }
+            });
+            nextLi.appendChild(nextLink);
+            ul.appendChild(nextLi);
+
+            paginationContainer.appendChild(ul);
+        }
+
+        // Function to update the active alerts list
+        function updateAlertsList(alerts) {
+            try {
+                const container = document.getElementById('activeAlertsContainer');
+                if (!container) {
+                    console.warn('#activeAlertsContainer not found');
+                    return;
+                }
+
+                if (!alerts || alerts.length === 0) {
+                    container.innerHTML = '<p class="text-center text-muted p-3 mb-0">No active alerts.</p>';
+                    return;
+                }
+
+                // Map alerts to HTML list items - Use default styling
+                container.innerHTML = alerts.map(alert => {
+                    const alertClass = 'alert-warning'; // Default to warning
+                    const iconClass = 'fa-exclamation-triangle'; // Default icon
+                    const deviceName = alert.devices?.name || 'Unknown Device';
+                    return `
+                        <div class="alert ${alertClass} d-flex align-items-start p-2 mb-2" role="alert">
+                            <i class="fas ${iconClass} mt-1 me-2"></i>
+                            <div>
+                                <small><strong>${deviceName}:</strong> ${alert.message || 'No details provided.'}</small>
+                                <div class="text-muted small mt-1">${new Date(alert.created_at).toLocaleString()}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                 console.error("Error updating alerts list:", error);
+                 const container = document.getElementById('activeAlertsContainer');
+                 if(container) container.innerHTML = '<p class="text-center text-danger p-3 mb-0">Error loading alerts.</p>';
+            }
+        }
+
+        async function loadDevicesList() {
+            console.log("Loading devices list...");
+            const tbody = document.getElementById('devicesTableBody');
+            if (!tbody) {
+                console.error('#devicesTableBody element not found!');
+                return;
+            }
+
+            // Show loading state
+            tbody.innerHTML = `<tr><td colspan="5" class="text-center p-5 text-muted"><i class="fas fa-spinner fa-spin me-2"></i>Loading devices...</td></tr>`;
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error("User not authenticated");
+
+                const { data: devices, error } = await supabaseClient
+                    .from('devices')
+                    .select('id, device_id, name, location, last_reading') // Select needed columns
+                    .eq('user_id', user.id)
+                    .order('name', { ascending: true }); // Order by name for example
+
+                if (error) throw error;
+
+                if (!devices || devices.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="text-center p-5 text-muted">No devices found. Use the 'Add Device' button to add one.</td></tr>`;
+                    return;
+                }
+
+                // Populate table
+                tbody.innerHTML = devices.map(device => {
+                    const deviceIdText = device.device_id || 'N/A';
+                    const deviceName = device.name || 'N/A';
+                    return `
+                        <tr>
+                            <td title="${deviceIdText}">${deviceIdText}</td>
+                            <td>${deviceName}</td>
+                            <td>${device.location || 'N/A'}</td>
+                            <td>${device.last_reading ? new Date(device.last_reading).toLocaleString() : 'Never'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary me-1" onclick="openEditDeviceModal('${device.id}')" title="Edit ${deviceName}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="openDeleteDeviceModal('${device.id}', '${deviceName}', '${deviceIdText}')" title="Delete ${deviceName}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error("Error loading devices list:", error);
+                tbody.innerHTML = `<tr><td colspan="5" class="text-center p-5 text-danger">Error loading devices: ${error.message}</td></tr>`;
+            }
+        }
+
+        function setupRealtimeSubscriptions() {
+            // Ensure only one subscription exists
+            if (readingsSubscription) {
+                console.log('Removing existing readings subscription.');
+                supabaseClient.removeChannel(readingsSubscription);
+            }
+
+            console.log('Setting up realtime subscription for readings...');
+            readingsSubscription = supabaseClient
+                .channel('public:readings')
+                .on('postgres_changes',
+                    { event: 'INSERT', schema: 'public', table: 'readings' },
+                    (payload) => {
+                        console.log('New reading received:', payload.new);
+                        // Simple approach for MVP: Reload all data
+                        // More advanced: Prepend new reading to table, update chart incrementally
+                        loadDashboardData();
+                    }
+                )
+                .subscribe((status, err) => {
+                    if (err) {
+                        console.error('Error subscribing to readings:', err);
+                        showStatus('Realtime connection failed', 'error');
+                    } else {
+                        console.log('Successfully subscribed to readings changes. Status:', status);
+                    }
+                });
+        }
+
+        // Function to open and populate the Edit Device modal
+        async function openEditDeviceModal(deviceId) {
+            console.log("Opening edit modal for device:", deviceId);
+            const modalElement = document.getElementById('editDeviceModal');
+            if (!modalElement) return;
+            const editModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            showStatus('Loading device details...');
+            try {
+                const { data: device, error } = await supabaseClient
+                    .from('devices')
+                    .select('id, device_id, name, location, calibration_factor')
+                    .eq('id', deviceId)
+                    .single();
+                if (error) throw error;
+                if (!device) throw new Error('Device not found.');
+                document.getElementById('editDeviceIdInternal').value = device.id;
+                document.getElementById('editDeviceTextId').value = device.device_id || 'N/A';
+                document.getElementById('editDeviceName').value = device.name || '';
+                document.getElementById('editDeviceLocation').value = device.location || '';
+                document.getElementById('editDeviceCalibration').value = device.calibration_factor ?? 1.0;
+                hideStatus();
+                editModal.show();
+            } catch (error) {
+                console.error('Error fetching device details for edit:', error);
+                hideStatus();
+                showStatus(`Failed to load device details: ${error.message}`, 'error');
+            }
+        }
+
+        // Function to handle the update when "Save Changes" is clicked in edit modal
+        async function handleUpdateDevice() {
+            const deviceUuid = document.getElementById('editDeviceIdInternal')?.value;
+            const nameInput = document.getElementById('editDeviceName');
+            const locationInput = document.getElementById('editDeviceLocation');
+            const calibrationInput = document.getElementById('editDeviceCalibration');
+            const updateBtn = document.getElementById('updateDeviceBtn');
+            if (!deviceUuid || !nameInput || !locationInput || !calibrationInput || !updateBtn) return;
+            const name = nameInput.value.trim();
+            if (!name) { alert('Device Name is required.'); return; }
+            const location = locationInput.value.trim() || null;
+            const calibrationFactor = parseFloat(calibrationInput.value) || 1.0;
+            if (isNaN(calibrationFactor) || calibrationFactor < 0) { alert('Invalid Calibration Factor.'); return; }
+            console.log(`Attempting to update device UUID: ${deviceUuid}`);
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Updating...';
+            showStatus('Updating device...');
+            try {
+                const { error } = await supabaseClient.from('devices').update({ name, location, calibration_factor: calibrationFactor }).eq('id', deviceUuid);
+                if (error) throw error;
+                console.log('Device updated successfully');
+                hideStatus();
+                showStatus('Device updated successfully!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('editDeviceModal')).hide();
+                loadDevicesList();
+            } catch (error) {
+                console.error('Error updating device:', error);
+                hideStatus();
+                showStatus(`Failed to update device: ${error.message}`, 'error');
+            } finally {
+                 updateBtn.disabled = false;
+                 updateBtn.innerHTML = 'Save Changes';
+            }
+        }
+
+        // Function to open the delete confirmation modal
+        function openDeleteDeviceModal(deviceId, deviceName, deviceTextId) {
+            console.log("Opening delete modal for device:", deviceId, deviceName);
+            const modalElement = document.getElementById('deleteDeviceModal');
+            if (!modalElement) return;
+            const deleteModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            document.getElementById('deleteDeviceId').value = deviceId;
+            const nameToShow = deviceName && deviceName !== 'N/A' ? deviceName : deviceTextId;
+            document.getElementById('deleteDeviceName').textContent = nameToShow || 'this device';
+            deleteModal.show();
+        }
+
+        // Function to handle the actual deletion
+        async function confirmDeleteDevice() {
+            const deviceUuid = document.getElementById('deleteDeviceId')?.value;
+            const confirmBtn = document.getElementById('confirmDeleteBtn');
+            if (!deviceUuid || !confirmBtn) return;
+            console.log(`Attempting to delete device UUID: ${deviceUuid}`);
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Deleting...';
+            showStatus('Deleting device...');
+            try {
+                const { error } = await supabaseClient.from('devices').delete().eq('id', deviceUuid);
+                if (error) throw error;
+                console.log('Device deleted successfully');
+                hideStatus();
+                showStatus('Device deleted successfully!', 'success');
+                bootstrap.Modal.getInstance(document.getElementById('deleteDeviceModal')).hide();
+                loadDevicesList();
+            } catch (error) {
+                console.error('Error deleting device:', error);
+                hideStatus();
+                showStatus(`Failed to delete device: ${error.message}`, 'error');
+            } finally {
+                 confirmBtn.disabled = false;
+                 confirmBtn.innerHTML = 'Delete';
+            }
+        }
+
+        async function handleAddDevice() {
+            console.log("Attempting to add new device...");
+            const nameInput = document.getElementById('newDeviceName');
+            const locationInput = document.getElementById('newDeviceLocation');
+            const calibrationInput = document.getElementById('newDeviceCalibration');
+            const saveBtn = document.getElementById('saveNewDeviceBtn');
+
+            // Basic Validation
+            const name = nameInput ? nameInput.value.trim() : '';
+            if (!name) {
+                alert('Device Name is required.');
+                nameInput?.focus();
+                return;
+            }
+            const location = locationInput ? locationInput.value.trim() : null;
+            const calibrationFactor = calibrationInput ? (parseFloat(calibrationInput.value) || 1.0) : 1.0;
+
+            // Disable button and show loading state
+            if(saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+            }
+            showStatus('Adding device...');
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error('User not authenticated');
+
+                // Insert data - Supabase trigger should handle device_id generation
+                const { data: newDevice, error } = await supabaseClient
+                    .from('devices')
+                    .insert([
+                        {
+                            name: name,
+                            location: location,
+                            calibration_factor: calibrationFactor,
+                            user_id: user.id
+                            // device_id is handled by DB trigger based on your previous setup
+                        }
+                    ])
+                    .select() // Select the newly inserted row
+                    .single(); // Expecting one row back
+
+                if (error) throw error;
+
+                console.log('Device added successfully:', newDevice);
+                hideStatus();
+                showStatus('Device added successfully!', 'success'); // Use status/toast later
+                bootstrap.Modal.getInstance(document.getElementById('addDeviceModal')).hide(); // Hide modal
+                loadDevicesList(); // Refresh the list
+
+                // Optional: Clear the form (though modal hide might do this)
+                document.getElementById('addDeviceForm')?.reset();
+
+            } catch (error) {
+                console.error("Error adding device:", error);
+                hideStatus();
+                showStatus(`Error adding device: ${error.message}`, 'error');
+            } finally {
+                // Re-enable button
+                if(saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = 'Save Device';
+                }
+            }
+        }
+
+        // Function to load user settings from Supabase
+        async function loadUserSettings() {
+            console.log("Loading user settings...");
+            const thresholdInput = document.getElementById('alertThreshold');
+            const intervalInput = document.getElementById('updateInterval');
+
+            if (!thresholdInput || !intervalInput) {
+                console.error("Settings form elements not found!");
+                return;
+            }
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error("User not authenticated");
+
+                const { data: settings, error } = await supabaseClient
+                    .from('user_settings')
+                    .select('alert_threshold, update_interval')
+                    .eq('user_id', user.id)
+                    .maybeSingle(); // Returns null instead of error if no row found
+
+                if (error) throw error;
+
+                // Populate form with loaded settings or defaults
+                if (settings) {
+                    console.log('Found existing settings:', settings);
+                    thresholdInput.value = settings.alert_threshold ?? ''; // Use empty string if null
+                    intervalInput.value = settings.update_interval ?? ''; // Use empty string if null
+                } else {
+                    console.log('No existing settings found, using defaults/placeholders.');
+                    // Keep placeholders or set explicit defaults if desired
+                     thresholdInput.value = ''; // Clear any previous value
+                     intervalInput.value = ''; // Clear any previous value
+                }
+            } catch (error) {
+                console.error("Error loading user settings:", error);
+                showStatus(`Error loading settings: ${error.message}`, 'error');
+                // Optionally disable the form or show error message in form
+            }
+        }
+
+        // Function to handle saving user settings
+        async function handleSaveSettings(event) {
+            event.preventDefault(); // Prevent default form submission
+            console.log("Attempting to save settings...");
+
+            const thresholdInput = document.getElementById('alertThreshold');
+            const intervalInput = document.getElementById('updateInterval');
+            const saveBtn = document.getElementById('saveSettingsBtn');
+
+            if (!thresholdInput || !intervalInput || !saveBtn) {
+                console.error("Settings form elements for saving not found!");
+                return;
+            }
+
+            // Get and validate values
+            const alertThreshold = thresholdInput.value ? parseFloat(thresholdInput.value) : null;
+            const updateInterval = intervalInput.value ? parseInt(intervalInput.value, 10) : null;
+
+            // Example validation (adjust as needed)
+            if (thresholdInput.value && (isNaN(alertThreshold) || alertThreshold < 0)) {
+                alert('Alert Threshold must be a non-negative number.');
+                thresholdInput.focus();
+                return;
+            }
+            if (intervalInput.value && (isNaN(updateInterval) || updateInterval <= 0)) {
+                 alert('Update Interval must be a positive integer (minutes).');
+                 intervalInput.focus();
+                return;
+            }
+
+            // Disable button and show status
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+            showStatus('Saving settings...');
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error('User not authenticated');
+
+                // Use upsert: updates if user_id exists, inserts if not
+                const { error } = await supabaseClient
+                    .from('user_settings')
+                    .upsert({
+                        user_id: user.id, // Match on this column (PK)
+                        alert_threshold: alertThreshold,
+                        update_interval: updateInterval,
+                        updated_at: new Date().toISOString() // Keep track of last update
+                    }, {
+                        onConflict: 'user_id' // Specify the column for conflict resolution
+                    });
+
+                if (error) throw error;
+
+                console.log('Settings saved successfully.');
+                hideStatus();
+                showStatus('Settings saved successfully!', 'success');
+                // Optionally show a toast notification as well
+                // showToast('Success', 'Settings saved.', 'success');
+
+            } catch (error) {
+                console.error("Error saving settings:", error);
+                hideStatus();
+                showStatus(`Error saving settings: ${error.message}`, 'error');
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = 'Save Settings';
+            }
+        }
+
+        // Function to generate and display the report chart
+        async function generateReport() {
+            console.log("Generating report...");
+            const startDateInput = document.getElementById('reportStartDate');
+            const endDateInput = document.getElementById('reportEndDate');
+            const generateBtn = document.getElementById('generateReportBtn');
+            const chartStatusEl = document.getElementById('reportChartStatus');
+            const reportChartCanvas = document.getElementById('reportChartCanvas');
+
+            if (!startDateInput || !endDateInput || !generateBtn || !chartStatusEl || !reportChartCanvas) {
+                console.error("Report elements not found!");
+                return;
+            }
+
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            // Validation
+            if (!startDate || !endDate) {
+                alert('Please select both start and end dates.');
+                return;
+            }
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            if (start > end) {
+                alert('Start date cannot be after end date.');
+                return;
+            }
+            // Adjust end date to include the whole day
+            end.setHours(23, 59, 59, 999);
+            const adjustedEndDate = end.toISOString();
+
+            // Update UI State: Show loading
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Generating...';
+            chartStatusEl.textContent = 'Loading report data...';
+            chartStatusEl.classList.remove('d-none', 'text-danger');
+            reportChartCanvas.classList.add('d-none'); // Hide canvas while loading
+            if (reportChartInstance) { reportChartInstance.destroy(); reportChartInstance = null; } // Clear previous chart
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error("User not authenticated");
+
+                console.log(`Fetching report data from ${startDate} to ${adjustedEndDate}`);
+
+                // Fetch readings within the date range for the user's devices
+                const { data: reportData, error } = await supabaseClient
+                    .from('readings')
+                    .select('kwh_value, timestamp, devices!inner(id)') // Only need kwh and timestamp
+                    .eq('devices.user_id', user.id)
+                    .gte('timestamp', start.toISOString()) // Use start date as is
+                    .lte('timestamp', adjustedEndDate)      // Use adjusted end date
+                    .order('timestamp', { ascending: true }); // Order ascending for processing
+
+                if (error) throw error;
+
+                if (!reportData || reportData.length === 0) {
+                    console.log('No data found for the selected range.');
+                    chartStatusEl.textContent = 'No readings found for the selected date range.';
+                    chartStatusEl.classList.remove('d-none');
+                    reportChartCanvas.classList.add('d-none');
+                    return; // Stop processing
+                }
+
+                console.log(`Found ${reportData.length} readings for the report.`);
+
+                // Process data: Aggregate by day
+                const dailyData = {}; // { 'YYYY-MM-DD': totalKwh }
+                reportData.forEach(r => {
+                    if (!r.timestamp || r.kwh_value == null) return; // Skip invalid data
+                    try {
+                         // Extract date part in local timezone for grouping
+                         const localDate = new Date(r.timestamp);
+                         const day = localDate.toISOString().substring(0, 10);
+                         dailyData[day] = (dailyData[day] || 0) + (r.kwh_value || 0);
+                    } catch(dateError) {
+                        console.warn("Skipping reading due to invalid date:", r.timestamp, dateError);
+                    }
+                });
+
+                const labels = Object.keys(dailyData).sort(); // Sort dates chronologically
+                const dataValues = labels.map(day => dailyData[day]);
+
+                // Update the report chart
+                updateReportChart(labels, dataValues);
+                chartStatusEl.classList.add('d-none'); // Hide status message
+                reportChartCanvas.classList.remove('d-none'); // Show chart canvas
+
+            } catch (error) {
+                console.error("Error generating report:", error);
+                chartStatusEl.textContent = `Error generating report: ${error.message}`;
+                chartStatusEl.classList.remove('d-none');
+                chartStatusEl.classList.add('text-danger');
+                reportChartCanvas.classList.add('d-none');
+            } finally {
+                // Restore button state
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i> Generate';
+            }
+        }
+
+        // Function to create/update the Report Chart
+        function updateReportChart(labels, data) {
+            try {
+                const ctx = document.getElementById('reportChartCanvas');
+                if (!ctx) {
+                     console.error('Report chart canvas element not found!');
+                     return;
+                }
+
+                // Destroy previous instance if exists
+                if (reportChartInstance) {
+                    reportChartInstance.destroy();
+                }
+
+                // Create new chart instance (e.g., Bar chart for daily totals)
+                reportChartInstance = new Chart(ctx, {
+                    type: 'bar', // Use bar chart for daily aggregates
+                    data: {
+                        labels: labels, // Dates (YYYY-MM-DD)
+                        datasets: [{
+                            label: 'Daily Consumption (kWh)',
+                            data: data,
+                            backgroundColor: 'rgba(0, 184, 148, 0.6)', // --secondary color with alpha
+                            borderColor: 'rgba(0, 184, 148, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }, // Hide legend for single dataset
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `${context.parsed.y.toFixed(2)} kWh`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: { display: true, text: 'kWh' }
+                            },
+                            x: {
+                                title: { display: true, text: 'Date' }
+                            }
+                        }
+                    }
+                });
+                updateChartThemes(); // Apply current theme colors
+            } catch (error) {
+                 console.error("Error updating report chart:", error);
+                 const chartStatusEl = document.getElementById('reportChartStatus');
+                 if(chartStatusEl) {
+                     chartStatusEl.textContent = 'Error displaying report chart.';
+                     chartStatusEl.classList.remove('d-none');
+                     chartStatusEl.classList.add('text-danger');
+                 }
+            }
+        }
+
+        // --- Event Listeners ---
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('MVP Dashboard Initializing...');
+
+            // Initialize theme FIRST
+            initializeTheme();
+
+            // Check login status
+            checkUserLogin();
+
+            // Dark Mode Toggle Listener
+            const darkModeSwitch = document.getElementById('darkModeSwitch');
+            if (darkModeSwitch) {
+                darkModeSwitch.addEventListener('change', toggleTheme);
+            } else {
+                console.warn('Dark mode switch element not found.');
+            }
+
+            // Logout Button
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    handleLogout();
+                });
+            }
+
+             // Sidebar Toggle Button
+             const sidebarToggle = document.getElementById('sidebarToggle');
+             const sidebar = document.getElementById('sidebar');
+             if (sidebarToggle && sidebar) {
+                 sidebarToggle.addEventListener('click', () => {
+                     sidebar.classList.toggle('show');
+                 });
+
+                 // Optional: Close sidebar when clicking main content on mobile
+                 const mainContent = document.querySelector('.main-content');
+                 if (mainContent) {
+                     mainContent.addEventListener('click', () => {
+                         if (window.innerWidth < 768 && sidebar.classList.contains('show')) {
+                             sidebar.classList.remove('show');
+                         }
+                     });
+                 }
+             }
+
+            // Add listener for when the Devices tab is shown
+            const devicesTabElement = document.querySelector('a[data-bs-target="#devices-content"]');
+            if (devicesTabElement) {
+                devicesTabElement.addEventListener('shown.bs.tab', function (event) {
+                    console.log('Devices tab shown, reloading list.');
+                    loadDevicesList(); // Reload device list when tab becomes active
+                });
+            } else {
+                console.warn('Devices tab link not found.');
+            }
+
+            // Settings Form Submission
+            const settingsForm = document.getElementById('settingsForm');
+            if (settingsForm) {
+                console.log('Attaching listener to settings form'); // Debug log
+                settingsForm.addEventListener('submit', handleSaveSettings);
+            }
+            else {
+                 console.warn('Settings form (#settingsForm) not found!');
+            }
+
+            // Add Device Modal Save Button
+            const saveNewDeviceBtn = document.getElementById('saveNewDeviceBtn');
+            if (saveNewDeviceBtn) {
+                saveNewDeviceBtn.addEventListener('click', handleAddDevice);
+            }
+
+            // Edit Device Modal Save Button
+            const updateDeviceBtn = document.getElementById('updateDeviceBtn');
+            if (updateDeviceBtn) {
+                updateDeviceBtn.addEventListener('click', handleUpdateDevice);
+            }
+
+            // Delete Device Confirmation Button
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', confirmDeleteDevice);
+            }
+
+            // Reports Tab Generate Button
+            const generateReportBtn = document.getElementById('generateReportBtn');
+            if (generateReportBtn) {
+                generateReportBtn.addEventListener('click', generateReport);
+            }
+            else {
+                console.warn('Generate Report button (#generateReportBtn) not found!');
+            }
+        });
+
+        // Cleanup subscription on page unload
+        window.addEventListener('beforeunload', () => {
+            if (readingsSubscription) {
+                console.log('Removing Supabase subscription before unload...');
+                supabaseClient.removeChannel(readingsSubscription);
+            }
+        });
+
+    </script>
+
+</body>
+</html> 

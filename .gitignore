@@ -1,32 +1,34 @@
-# Prerequisites
-*.d
+# Environment variables
+.env
+.env.local
+.env.*.local
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Dependencies
+node_modules/
+package-lock.json
 
-# Precompiled Headers
-*.gch
-*.pch
+# IDE/Editor folders
+.vscode/
+.idea/
+*.swp
+*.swo
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Fortran module files
-*.mod
-*.smod
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
-*.exe
-*.out
-*.app
+# Build/Deploy directories
+dist/
+build/
+.vercel/

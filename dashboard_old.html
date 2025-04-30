@@ -1,0 +1,4335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Power Meter - Dashboard</title>
+    
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            /* Color variables from provided palette */
+            --primary: #6C5CE7; /* Purple */
+            --secondary: #00B894; /* Green */
+            --accent: #FD79A8; /* Pink */
+            --danger: #e17055; /* Orange/Red - Alert */
+            --success: #55efc4; /* Mint - Success */
+            --info: #74b9ff; /* Light Blue - Info */
+            --warning: #fdcb6e; /* Yellow - Adding this for completeness */
+            
+            /* Light theme colors */
+            --bg-color: #F1F2F6; /* BG Light */
+            --card-bg: #FFFFFF; /* Card */
+            --text-color: #2D3436; /* Text */
+            --text-muted: #636e72; /* Lighter text for secondary text */
+            --border-color: #dfe6e9;
+            
+            /* Dark theme colors */
+            --bg-color-dark: #2f3640; /* Dark BG */
+            --card-bg-dark: #353b48; /* Dark Card */
+            --text-color-dark: #f5f6fa; /* Light text for dark mode */
+            --text-muted-dark: #b2bec3; /* Muted text for dark mode */
+            --border-color-dark: #4a5568;
+            
+            /* Spacing */
+            --spacing-xs: 0.5rem;
+            --spacing-sm: 0.75rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-xxl: 3rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.08);
+            --shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.1);
+            
+            /* Border radius */
+            --border-radius-sm: 0.375rem;
+            --border-radius: 0.75rem;
+            --border-radius-lg: 1rem;
+        }
+        
+        /* Dark theme overrides */
+        [data-bs-theme="dark"] {
+            --bg-color: var(--bg-color-dark);
+            --card-bg: var(--card-bg-dark);
+            --text-color: var(--text-color-dark);
+            --text-muted: var(--text-muted-dark);
+            --border-color: var(--border-color-dark);
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        
+        /* Sidebar */
+        #sidebar {
+            background-color: white;
+            position: fixed;
+            height: 100vh;
+            width: 280px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+            z-index: 1030;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+        }
+        
+        [data-bs-theme="dark"] #sidebar {
+            background-color: var(--card-bg-dark);
+            border-right-color: var(--border-color-dark);
+        }
+        
+        .sidebar-header {
+            padding: var(--spacing-xl);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .sidebar-brand {
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .sidebar-content {
+            padding: var(--spacing-md) 0;
+        }
+        
+        .nav-section-label {
+            padding: var(--spacing-xs) var(--spacing-lg);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-top: var(--spacing-md);
+        }
+        
+        #sidebar .nav-link {
+            padding: var(--spacing-sm) var(--spacing-lg);
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: 500;
+            transition: all 0.2s ease;
+            margin: 2px var(--spacing-xs);
+            border-radius: var(--border-radius-sm);
+        }
+        
+        #sidebar .nav-link i {
+            width: 1.25rem;
+            text-align: center;
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+        
+        #sidebar .nav-link:hover {
+            background-color: rgba(108, 92, 231, 0.1);
+            color: var(--primary);
+        }
+        
+        [data-bs-theme="dark"] #sidebar .nav-link:hover {
+            background-color: rgba(108, 92, 231, 0.2);
+            color: var(--primary);
+        }
+        
+        #sidebar .nav-link.active {
+            background-color: rgba(108, 92, 231, 0.15);
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        [data-bs-theme="dark"] #sidebar .nav-link.active {
+            background-color: rgba(108, 92, 231, 0.25);
+        }
+        
+        #sidebar .nav-link.active i {
+            color: var(--primary);
+        }
+        
+        /* Main content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: var(--spacing-xl);
+            max-width: 100%;
+            transition: margin-left 0.3s ease, padding 0.3s ease;
+        }
+        
+        /* Mobile sidebar toggle */
+        #sidebarToggle {
+            display: none;
+            position: fixed;
+            top: var(--spacing-md);
+            left: var(--spacing-md);
+            z-index: 1040;
+            width: 3rem;
+            height: 3rem;
+            border-radius: var(--border-radius-sm);
+            background-color: var(--primary);
+            color: white;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            box-shadow: var(--shadow-md);
+            transition: all 0.2s ease;
+        }
+        
+        #sidebarToggle:hover {
+            background-color: #5649d1;
+            transform: scale(1.05);
+        }
+        
+        /* Responsive behavior */
+        @media (max-width: 1199.98px) {
+            #sidebar {
+                width: 260px;
+            }
+            
+            .main-content {
+                margin-left: 260px;
+            }
+        }
+        
+        @media (max-width: 991.98px) {
+            #sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            #sidebar.show {
+                transform: translateX(0);
+                box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: calc(var(--spacing-xl) + 2rem) var(--spacing-lg) var(--spacing-lg);
+            }
+            
+            #sidebarToggle {
+                display: flex;
+            }
+        }
+        
+        @media (max-width: 767.98px) {
+            .main-content {
+                padding: calc(var(--spacing-xl) + 2rem) var(--spacing-md) var(--spacing-md);
+            }
+        }
+        
+        @media (max-width: 575.98px) {
+            .main-content {
+                padding: calc(var(--spacing-xl) + 1rem) var(--spacing-sm) var(--spacing-sm);
+            }
+        }
+        
+        /* Cards */
+        .card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            border: none;
+            margin-bottom: var(--spacing-lg);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-3px);
+        }
+        
+        .card-header {
+            background-color: transparent;
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--spacing-lg);
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: var(--spacing-lg);
+        }
+        
+        .card-footer {
+            background-color: transparent;
+            border-top: 1px solid var(--border-color);
+            padding: var(--spacing-md) var(--spacing-lg);
+        }
+        
+        /* Stat cards */
+        .stat-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: var(--spacing-lg);
+            position: relative;
+        }
+        
+        .stat-card .icon-wrapper {
+            width: 4rem;
+            height: 4rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-md);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover .icon-wrapper {
+            transform: scale(1.1);
+        }
+        
+        .stat-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+            color: var(--text-color);
+            line-height: 1.2;
+        }
+        
+        .stat-card .label {
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+        }
+        
+        /* Card controls */
+        .card-drag-handle, .card-visibility-toggle {
+            position: absolute;
+            top: var(--spacing-xs);
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background-color: rgba(0,0,0,0.05);
+            opacity: 0.7;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            z-index: 2;
+        }
+        
+        .card-drag-handle {
+            left: var(--spacing-xs);
+        }
+        
+        .card-visibility-toggle {
+            right: var(--spacing-xs);
+        }
+        
+        .card-drag-handle:hover, .card-visibility-toggle:hover {
+            opacity: 1;
+            background-color: rgba(0,0,0,0.1);
+        }
+        
+        [data-bs-theme="dark"] .card-drag-handle, [data-bs-theme="dark"] .card-visibility-toggle {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
+        [data-bs-theme="dark"] .card-drag-handle:hover, [data-bs-theme="dark"] .card-visibility-toggle:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+        
+        /* Icon colors */
+        .icon-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .icon-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .icon-accent {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .icon-info {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .icon-success {
+            background-color: var(--success);
+            color: var(--text-color);
+        }
+        
+        .icon-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .icon-warning {
+            background-color: var(--warning);
+            color: var(--text-color);
+        }
+        
+        /* Buttons */
+        .btn {
+            font-weight: 500;
+            padding: 0.625rem 1.25rem;
+            border-radius: var(--border-radius-sm);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        .btn-lg {
+            padding: 0.75rem 1.5rem;
+            font-size: 1.125rem;
+        }
+        
+        .btn i {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover, .btn-primary:focus {
+            background-color: #5649d1;
+            border-color: #5649d1;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-secondary:hover, .btn-secondary:focus {
+            background-color: #00a182;
+            border-color: #00a182;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            border-color: var(--success);
+            color: var(--text-color);
+        }
+        
+        .btn-success:hover, .btn-success:focus {
+            background-color: #3cdfb4;
+            border-color: #3cdfb4;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            border-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover, .btn-danger:focus {
+            background-color: #d05c41;
+            border-color: #d05c41;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+            background-color: transparent;
+        }
+        
+        .btn-outline-primary:hover, .btn-outline-primary:focus, .btn-outline-primary.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .btn-outline-secondary {
+            color: var(--text-color);
+            border-color: var(--border-color);
+            background-color: transparent;
+        }
+        
+        .btn-outline-secondary:hover, .btn-outline-secondary:focus {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--text-color);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        /* Tables */
+        .table {
+            color: var(--text-color);
+            margin-bottom: 0;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        
+        .table-responsive {
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+        }
+        
+        .table th {
+            font-weight: 600;
+            color: var(--text-muted);
+            border-top: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+        
+        .table td {
+            padding: var(--spacing-sm) var(--spacing-md);
+            vertical-align: middle;
+            border-color: var(--border-color);
+        }
+        
+        .table-hover tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        .table-hover tbody tr:hover {
+            background-color: rgba(108, 92, 231, 0.05);
+        }
+        
+        /* Page header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+            flex-wrap: wrap;
+            gap: var(--spacing-md);
+        }
+        
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        @media (max-width: 767.98px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .page-title {
+                font-size: 1.5rem;
+                margin-bottom: var(--spacing-sm);
+            }
+        }
+        
+        /* Spacing utilities */
+        .gap-xs { gap: var(--spacing-xs); }
+        .gap-sm { gap: var(--spacing-sm); }
+        .gap-md { gap: var(--spacing-md); }
+        .gap-lg { gap: var(--spacing-lg); }
+        .gap-xl { gap: var(--spacing-xl); }
+        
+        .mb-xs { margin-bottom: var(--spacing-xs); }
+        .mb-sm { margin-bottom: var(--spacing-sm); }
+        .mb-md { margin-bottom: var(--spacing-md); }
+        .mb-lg { margin-bottom: var(--spacing-lg); }
+        .mb-xl { margin-bottom: var(--spacing-xl); }
+        
+        .mt-xs { margin-top: var(--spacing-xs); }
+        .mt-sm { margin-top: var(--spacing-sm); }
+        .mt-md { margin-top: var(--spacing-md); }
+        .mt-lg { margin-top: var(--spacing-lg); }
+        .mt-xl { margin-top: var(--spacing-xl); }
+        
+        /* Chart containers */
+        .chart-container {
+            position: relative;
+            height: 280px;
+            width: 100%;
+        }
+        
+        @media (max-width: 767.98px) {
+            .chart-container {
+                height: 220px;
+            }
+        }
+        
+        /* Hidden card styling */
+        .card-hidden {
+            opacity: 0.6;
+        }
+        
+        .hidden-card {
+            display: none;
+        }
+        
+        /* Tooltips */
+        .tooltip {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.875rem;
+        }
+        
+        /* Status alerts */
+        #status-container {
+            position: fixed;
+            bottom: var(--spacing-lg);
+            right: var(--spacing-lg);
+            z-index: 1050;
+        }
+        
+        .alert {
+            box-shadow: var(--shadow-md);
+            border-radius: var(--border-radius-sm);
+        }
+        
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: var(--spacing-lg);
+            right: var(--spacing-lg);
+            z-index: 1060;
+            max-width: 350px;
+            width: 100%;
+        }
+        
+        .toast {
+            border-radius: var(--border-radius-sm);
+            box-shadow: var(--shadow-md);
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            border: none;
+            overflow: hidden;
+            margin-bottom: var(--spacing-sm);
+            background-color: var(--card-bg);
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast-header {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-sm) var(--spacing-md);
+            color: var(--text-color);
+            background-color: transparent;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .toast-body {
+            padding: var(--spacing-md);
+            color: var(--text-color);
+        }
+        
+        .toast .btn-close {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            transition: opacity 0.2s ease;
+        }
+        
+        .toast .btn-close:hover {
+            opacity: 1;
+        }
+        
+        /* Theme-specific toast styles */
+        .toast.text-bg-success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        .toast.text-bg-success .toast-header {
+            color: #065f46;
+            background-color: #d1fae5;
+            border-bottom-color: rgba(16, 185, 129, 0.2);
+        }
+        
+        .toast.text-bg-danger {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .toast.text-bg-danger .toast-header {
+            color: #b91c1c;
+            background-color: #fee2e2;
+            border-bottom-color: rgba(239, 68, 68, 0.2);
+        }
+        
+        .toast.text-bg-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .toast.text-bg-warning .toast-header {
+            color: #92400e;
+            background-color: #fef3c7;
+            border-bottom-color: rgba(245, 158, 11, 0.2);
+        }
+        
+        /* Status message styling */
+        #statusMessage {
+            position: fixed;
+            top: var(--spacing-lg);
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
+            display: flex;
+            align-items: center;
+            background-color: var(--card-bg);
+            box-shadow: var(--shadow-lg);
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            z-index: 1100;
+            transition: transform 0.3s ease;
+            min-width: 200px;
+            max-width: 80%;
+        }
+        
+        #statusMessage.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        #statusMessage .status-icon {
+            margin-right: var(--spacing-sm);
+            font-size: 1.25rem;
+            width: 1.5rem;
+            text-align: center;
+        }
+        
+        #statusMessage .status-text {
+            flex: 1;
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        
+        /* Status message types */
+        #statusMessage.loading .status-icon {
+            color: var(--primary);
+        }
+        
+        #statusMessage.success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        
+        #statusMessage.success .status-icon {
+            color: #10b981;
+        }
+        
+        #statusMessage.error {
+            background-color: #fee2e2;
+            color: #b91c1c;
+            border-left: 4px solid #ef4444;
+        }
+        
+        #statusMessage.error .status-icon {
+            color: #ef4444;
+        }
+        
+        /* Dark mode overrides for toasts and status messages */
+        [data-bs-theme="dark"] .toast {
+            background-color: #334155;
+            color: #f8fafc;
+        }
+        
+        [data-bs-theme="dark"] .toast-header {
+            color: #f8fafc;
+            background-color: #1e293b;
+            border-bottom-color: #475569;
+        }
+        
+        [data-bs-theme="dark"] .toast.text-bg-success {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #d1fae5;
+            border-left-color: #10b981;
+        }
+        
+        [data-bs-theme="dark"] .toast.text-bg-success .toast-header {
+            color: #d1fae5;
+            background-color: rgba(16, 185, 129, 0.2);
+            border-bottom-color: rgba(16, 185, 129, 0.4);
+        }
+        
+        [data-bs-theme="dark"] .toast.text-bg-danger {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #fee2e2;
+            border-left-color: #ef4444;
+        }
+        
+        [data-bs-theme="dark"] .toast.text-bg-danger .toast-header {
+            color: #fee2e2;
+            background-color: rgba(239, 68, 68, 0.2);
+            border-bottom-color: rgba(239, 68, 68, 0.4);
+        }
+        
+        [data-bs-theme="dark"] .toast.text-bg-warning {
+            background-color: rgba(245, 158, 11, 0.2);
+            color: #fef3c7;
+            border-left-color: #f59e0b;
+        }
+        
+        [data-bs-theme="dark"] .toast.text-bg-warning .toast-header {
+            color: #fef3c7;
+            background-color: rgba(245, 158, 11, 0.2);
+            border-bottom-color: rgba(245, 158, 11, 0.4);
+        }
+        
+        [data-bs-theme="dark"] #statusMessage {
+            background-color: #334155;
+            color: #f8fafc;
+        }
+        
+        [data-bs-theme="dark"] #statusMessage.success {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #d1fae5;
+        }
+        
+        [data-bs-theme="dark"] #statusMessage.error {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: #fee2e2;
+        }
+        
+        /* Loading spinner animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fa-spin {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Mobile responsiveness for feedback elements */
+        @media (max-width: 767.98px) {
+            .toast-container {
+                bottom: var(--spacing-md);
+                right: var(--spacing-md);
+                left: var(--spacing-md);
+                max-width: none;
+            }
+            
+            #statusMessage {
+                width: 90%;
+            }
+        }
+        
+        /* Fade-in animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out forwards;
+        }
+        
+        /* Fixes for dashboard-specific cards and elements */
+        #statCardsContainer {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        #statCardsContainer [data-card-id] {
+            padding: var(--spacing-sm);
+            transition: all 0.3s ease;
+        }
+        
+        .card-content-row {
+            gap: var(--spacing-lg);
+        }
+        
+        @media (max-width: 767.98px) {
+            .card-content-row {
+                gap: var(--spacing-md);
+            }
+        }
+
+        /* Card shadow hover effect */
+        .shadow-hover {
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .shadow-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Alert list styling */
+        .alert-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            transition: background-color 0.2s ease;
+        }
+
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-item:hover {
+            background-color: rgba(108, 92, 231, 0.05);
+        }
+
+        .alert-item .alert-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: var(--spacing-sm);
+            flex-shrink: 0;
+        }
+
+        .alert-item .alert-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .alert-item .alert-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .alert-item .alert-device {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Skip link accessibility */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 0;
+            background: var(--primary);
+            color: white;
+            padding: 8px;
+            z-index: 2000;
+            transition: top 0.2s;
+        }
+
+        .skip-link:focus {
+            top: 0;
+        }
+
+        /* Dashboard action buttons improved spacing */
+        .dashboard-actions {
+            gap: var(--spacing-sm);
+        }
+
+        .dashboard-actions .btn-group {
+            box-shadow: var(--shadow-sm);
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+        }
+
+        .dashboard-actions .dropdown-menu {
+            box-shadow: var(--shadow-md);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-xs);
+        }
+
+        .dashboard-actions .dropdown-item {
+            border-radius: var(--border-radius-sm);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            transition: all 0.2s ease;
+        }
+
+        .dashboard-actions .dropdown-item:hover {
+            background-color: rgba(108, 92, 231, 0.1);
+        }
+
+        /* Dark mode toggle */
+        .dark-mode-toggle {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+
+        /* Improved form controls */
+        .form-select, .form-control {
+            border-radius: var(--border-radius-sm);
+            border-color: var(--border-color);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .form-select:focus, .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(108, 92, 231, 0.25);
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 50rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .status-badge-success {
+            background-color: rgba(85, 239, 196, 0.2);
+            color: #00b894;
+        }
+
+        .status-badge-warning {
+            background-color: rgba(253, 203, 110, 0.2);
+            color: #fdcb6e;
+        }
+
+        .status-badge-danger {
+            background-color: rgba(225, 112, 85, 0.2);
+            color: #e17055;
+        }
+
+        /* Progress animation */
+        @keyframes progress {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .animate-progress {
+            background: linear-gradient(90deg, rgba(108, 92, 231, 0.1), rgba(108, 92, 231, 0.2), rgba(108, 92, 231, 0.1));
+            background-size: 200% 100%;
+            animation: progress 2s ease infinite;
+        }
+
+        /* Better card header styling */
+        .card-header {
+            border-bottom: 1px solid var(--border-color);
+            background-color: rgba(241, 242, 246, 0.5);
+        }
+
+        [data-bs-theme="dark"] .card-header {
+            background-color: rgba(53, 59, 72, 0.5);
+        }
+
+        /* Improve table row hover */
+        .table-hover tbody tr {
+            cursor: pointer;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: rgba(108, 92, 231, 0.05);
+        }
+
+        [data-bs-theme="dark"] .table-hover tbody tr:hover {
+            background-color: rgba(108, 92, 231, 0.1);
+        }
+
+        /* Responsive Table Improvements */
+        @media (max-width: 767.98px) {
+            .table th,
+            .table td {
+                padding: var(--spacing-sm) var(--spacing-xs); /* Reduce padding on mobile */
+                font-size: 0.8rem; /* Slightly smaller font */
+            }
+
+            #recentReadings td:first-child,
+            #devicesTableBody td:first-child { /* Apply to both device tables */
+                max-width: 120px; /* Limit width of the ID column */
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+            
+            /* Ensure table fits container */
+             .table-responsive {
+                 width: 100%;
+                 overflow-x: auto; /* Add horizontal scroll if needed */
+                 -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+             }
+        }
+
+        /* Improve button group on smaller screens */
+        @media (max-width: 575.98px) {
+            .card-header .btn-group {
+                margin-top: var(--spacing-xs);
+                width: 100%;
+                display: flex;
+            }
+            .card-header .btn-group .btn {
+                flex-grow: 1; /* Make buttons fill width */
+            }
+            #recentReadings td:first-child,
+            #devicesTableBody td:first-child {
+                 max-width: 100px; /* Further reduce max-width */
+            }
+        }
+    </style>
+    
+    <script>
+        // Event listener for sidebar to prevent clicks from closing it
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+    <!-- Status Message -->
+    <div id="statusContainer" class="position-fixed top-0 start-0 w-100 p-3 d-none" style="z-index: 9999;">
+        <div class="alert alert-info d-flex align-items-center m-0" role="alert">
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            <div id="statusMessage">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Skip to content link for keyboard users - ACCESSIBILITY ENHANCEMENT -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
+    <!-- Sidebar Toggle Button for Mobile -->
+    <button id="sidebarToggle" class="btn" aria-label="Toggle sidebar menu" aria-expanded="false" aria-controls="sidebar">
+        <i class="fas fa-bars" aria-hidden="true"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div id="sidebar" role="navigation" aria-label="Main navigation">
+        <div class="sidebar-header">
+            <h5 class="sidebar-brand">
+                <i class="fas fa-bolt" aria-hidden="true"></i>
+                <span>Smart Power Meter</span>
+            </h5>
+        </div>
+        
+        <div class="sidebar-content">
+            <div class="nav-section">
+                <div class="nav-section-label" id="main-menu-label">Main Menu</div>
+                <ul class="nav flex-column" aria-labelledby="main-menu-label">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#dashboard" data-bs-toggle="tab" role="tab" aria-selected="true" aria-controls="dashboard">
+                            <i class="fas fa-tachometer-alt" aria-hidden="true"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#devices" data-bs-toggle="tab" role="tab" aria-selected="false" aria-controls="devices">
+                            <i class="fas fa-plug" aria-hidden="true"></i>
+                            <span>Devices</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#reports" data-bs-toggle="tab" role="tab" aria-selected="false" aria-controls="reports">
+                            <i class="fas fa-chart-bar" aria-hidden="true"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-section-label" id="settings-menu-label">Settings</div>
+                <ul class="nav flex-column" aria-labelledby="settings-menu-label">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#settings" data-bs-toggle="tab" role="tab" aria-selected="false" aria-controls="settings">
+                            <i class="fas fa-cog" aria-hidden="true"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            
+            <a class="nav-link nav-link-danger mt-auto" href="#" id="logoutBtn" aria-label="Log out of the application">
+                <i class="fas fa-sign-out-alt" aria-hidden="true"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+        
+        <!-- Dark Mode Toggle -->
+        <div class="dark-mode-toggle">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" role="switch" id="darkModeSwitch" aria-labelledby="darkModeLabel">
+                <label class="form-check-label" for="darkModeSwitch" id="darkModeLabel">Dark Mode</label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content fade-in" id="main-content">
+        <div class="container-fluid">
+            <!-- Stat Cards -->
+            <div class="row" id="statCardsContainer">
+                <!-- Cards will be dynamically added here -->
+            </div>
+
+            <!-- Consumption Chart -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-area me-2"></i>Power Consumption
+                    </h5>
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-outline-primary btn-sm active" data-range="day">24h</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-range="week">7d</button>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-range="month">30d</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div style="height: 300px;">
+                        <canvas id="consumptionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Readings -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>Recent Readings
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Device</th>
+                                    <th>Location</th>
+                                    <th>kWh</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentReadings">
+                                <!-- Readings will be dynamically added here -->
+                            </tbody>
+                        </table>
+                        <!-- Pagination Controls -->
+                        <nav aria-label="Readings pagination">
+                            <div id="readingsPagination" class="mt-3"></div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Active Alerts
+                    </h5>
+                </div>
+                <div class="card-body" id="alertsContainer">
+                    <!-- Alerts will be dynamically added here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Device Modal -->
+    <div class="modal fade" id="addDeviceModal" tabindex="-1" aria-labelledby="addDeviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addDeviceModalLabel">Add New Device</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDeviceForm">
+                        <div class="mb-3">
+                            <label for="newDeviceName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="newDeviceName" required>
+                            <div class="form-text">A descriptive name (e.g., "Living Room Meter").</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newDeviceLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="newDeviceLocation">
+                            <div class="form-text">Optional location description (e.g., "Basement Panel").</div>
+                        </div>
+                         <div class="mb-3">
+                            <label for="newDeviceCalibration" class="form-label">Calibration Factor</label>
+                            <input type="number" step="0.01" class="form-control" id="newDeviceCalibration" value="1.00">
+                            <div class="form-text">Optional calibration factor (default is 1.00).</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="saveNewDeviceBtn">Save Device</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device Added Confirmation Modal -->
+    <div class="modal fade" id="deviceAddedModal" tabindex="-1" aria-labelledby="deviceAddedModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="deviceAddedModalLabel">Device Added</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <p>Device '<span id="addedDeviceName"></span>' was added successfully.</p>
+            <p>Generated Device ID:</p>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" id="generatedDeviceId" readonly>
+              <button class="btn btn-outline-secondary" type="button" id="copyDeviceIdBtn">Copy</button>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Device Modal -->
+    <div class="modal fade" id="editDeviceModal" tabindex="-1" aria-labelledby="editDeviceModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editDeviceModalLabel">Edit Device</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editDeviceForm">
+                        <input type="hidden" id="editDeviceIdInternal"> <!-- Hidden field for UUID -->
+                        <div class="mb-3">
+                            <label for="editDeviceIdText" class="form-label">Device ID</label>
+                            <input type="text" class="form-control" id="editDeviceIdText" readonly>
+                            <div class="form-text">Device ID cannot be changed after creation.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDeviceName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="editDeviceName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editDeviceLocation" class="form-label">Location</label>
+                            <input type="text" class="form-control" id="editDeviceLocation">
+                        </div>
+                         <div class="mb-3">
+                            <label for="editDeviceCalibration" class="form-label">Calibration Factor</label>
+                            <input type="number" step="0.01" class="form-control" id="editDeviceCalibration" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="updateDeviceBtn">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Device Confirmation Modal -->
+    <div class="modal fade" id="deleteDeviceModal" tabindex="-1" aria-labelledby="deleteDeviceModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-confirm">
+          <div class="modal-header danger">
+            <div class="icon-box danger">
+              <i class="fas fa-trash"></i>
+            </div>
+          </div>
+          <div class="modal-body text-center">
+            <h4>Are you sure?</h4>
+            <p>Do you really want to delete the device "<span id="deleteDeviceName">this device</span>"? This action cannot be undone and will delete all associated readings and alerts.</p>
+            <input type="hidden" id="deleteDeviceId">
+          </div>
+          <div class="modal-footer justify-content-center">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Yes, Delete It</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap Toast Container -->
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+      <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+          <strong class="me-auto" id="toastTitle">Notification</strong>
+          <small id="toastTimestamp">Just now</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toastBody">
+          Message goes here.
+        </div>
+      </div>
+    </div>
+    
+    <!-- System Status Message -->
+    <div id="statusMessage" class="status-message">
+        <span class="status-icon"><i class="fas fa-circle-notch fa-spin"></i></span>
+        <span class="status-text">Loading data...</span>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Supabase JS -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <!-- Custom JS -->
+    <script>
+        // Supabase Initialization
+        const supabaseUrl = 'https://juciywnevycylsnqnbmq.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1Y2l5d25ldnljeWxzbnFuYm1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU0NTY3NjAsImV4cCI6MjA2MTAzMjc2MH0.jam9COWAITe4d1bYSuIyIp7ii-3R8_SlKoTIO5lwwjQ';
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Chart instances
+        let consumptionChartInstance = null;
+        let reportChartInstance = null;
+
+        // --- Toast Notification Helper --- 
+        let toastInstance = null;
+        function showToast(title, message, type = 'success') {
+            const toastEl = document.getElementById('liveToast');
+            if (!toastEl) return;
+            
+            const toastTitleEl = document.getElementById('toastTitle');
+            const toastBodyEl = document.getElementById('toastBody');
+            const toastTimestampEl = document.getElementById('toastTimestamp');
+
+            // Set current timestamp
+            toastTimestampEl.textContent = new Date().toLocaleTimeString();
+
+            // Remove existing color classes
+            toastEl.classList.remove('text-bg-success', 'text-bg-danger', 'text-bg-warning'); 
+            
+            // Add appropriate color class
+            if (type === 'success') {
+                toastEl.classList.add('text-bg-success');
+            } else if (type === 'error') {
+                toastEl.classList.add('text-bg-danger');
+            } else if (type === 'warning') {
+                toastEl.classList.add('text-bg-warning');
+            }
+
+            // Set content
+            toastTitleEl.textContent = title;
+            toastBodyEl.textContent = message;
+            
+            // Clear any existing toast timeout
+            if (toastInstance) {
+                clearTimeout(toastInstance);
+            }
+            
+            // Show the toast
+            const bsToast = new bootstrap.Toast(toastEl, { 
+                autohide: true,
+                delay: 5000 
+            });
+            
+            bsToast.show();
+            
+            // Ensure toast disappears after delay
+            toastInstance = setTimeout(() => {
+                bsToast.hide();
+                // Additional cleanup
+                toastEl.classList.remove('show');
+            }, 5000);
+        }
+        
+        // System Status Message Helper
+        let statusTimeout = null;
+        function showStatus(message, type = 'loading', duration = 0) {
+            const statusEl = document.getElementById('statusMessage');
+            if (!statusEl) return;
+            
+            const statusTextEl = statusEl.querySelector('.status-text');
+            const statusIconEl = statusEl.querySelector('.status-icon i');
+            
+            // Clear any existing timeout
+            if (statusTimeout) {
+                clearTimeout(statusTimeout);
+                statusTimeout = null;
+            }
+            
+            // Reset classes
+            statusEl.classList.remove('loading', 'success', 'error', 'show');
+            
+            // Set icon based on type
+            statusIconEl.className = ''; // Clear classes
+            switch(type) {
+                case 'success':
+                    statusIconEl.className = 'fas fa-check-circle';
+                    break;
+                case 'error':
+                    statusIconEl.className = 'fas fa-exclamation-circle';
+                    break;
+                default: // loading
+                    statusIconEl.className = 'fas fa-circle-notch fa-spin';
+                    break;
+            }
+            
+            // Set message and show
+            statusTextEl.textContent = message;
+            statusEl.classList.add(type, 'show');
+            
+            // Auto-hide if duration specified
+            if (duration > 0) {
+                statusTimeout = setTimeout(() => {
+                    hideStatus();
+                }, duration);
+            }
+            
+            return {
+                update: (newMessage) => {
+                    if (statusTextEl) statusTextEl.textContent = newMessage;
+                },
+                hide: () => hideStatus()
+            };
+        }
+        
+        function hideStatus() {
+            const statusEl = document.getElementById('statusMessage');
+            if (statusEl) {
+                statusEl.classList.remove('show');
+                
+                // Additional safety - force hide after animation
+                setTimeout(() => {
+                    statusEl.style.display = 'none';
+                    // Reset display style after brief delay
+                    setTimeout(() => {
+                        statusEl.style.display = '';
+                    }, 100);
+                }, 300);
+            }
+        }
+
+        // --- Theme Management --- 
+        const themeSwitch = document.getElementById('darkModeSwitch');
+        const currentTheme = localStorage.getItem('theme') ? localStorage.getItem('theme') : null;
+
+        // Apply the saved theme on initial load
+        function applyInitialTheme() {
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                if (themeSwitch) themeSwitch.checked = true;
+                console.log('Applied saved dark theme.');
+            } else {
+                 document.documentElement.setAttribute('data-bs-theme', 'light');
+                 if (themeSwitch) themeSwitch.checked = false;
+                 console.log('Applied default/saved light theme.');
+            }
+        }
+
+        // Function to switch theme
+        function switchTheme(e) {
+            if (e.target.checked) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                console.log('Switched to dark theme.');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                console.log('Switched to light theme.');
+            }
+             // Update chart colors whenever theme changes
+             updateAllChartThemes();
+        }
+
+        // Function to update chart colors based on current theme
+        function updateAllChartThemes() {
+             const isDarkMode = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+             console.log(`Updating chart themes via defaults. Dark mode: ${isDarkMode}`);
+             
+             // Define colors based on theme
+             const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.08)';
+             const ticksColor = isDarkMode ? '#94a3b8' : '#64748b';
+             const titleColor = isDarkMode ? '#e2e8f0' : '#1e293b';
+             
+             // Chart area and border colors
+             const chartAreaBg = isDarkMode ? 'rgba(30, 41, 59, 0.4)' : 'rgba(248, 250, 252, 0.4)';
+             const chartBorderColor = isDarkMode ? 'rgba(51, 65, 85, 0.5)' : 'rgba(226, 232, 240, 0.8)';
+             
+             // Dataset colors
+             const primaryColor = '#3b82f6';
+             const primaryAreaColor = isDarkMode ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.1)';
+
+             // --- Update Chart.js Global Defaults --- 
+             Chart.defaults.color = titleColor;
+             Chart.defaults.borderColor = gridColor;
+             Chart.defaults.font.family = "'Inter', sans-serif";
+             
+             // Set plugins default options
+             Chart.defaults.plugins.title.font = {
+                 weight: '600',
+                 size: 14
+             };
+             
+             Chart.defaults.plugins.tooltip.backgroundColor = isDarkMode ? '#1e293b' : '#ffffff';
+             Chart.defaults.plugins.tooltip.titleColor = isDarkMode ? '#e2e8f0' : '#1e293b';
+             Chart.defaults.plugins.tooltip.bodyColor = isDarkMode ? '#cbd5e1' : '#334155';
+             Chart.defaults.plugins.tooltip.borderColor = isDarkMode ? '#334155' : '#e2e8f0';
+             Chart.defaults.plugins.tooltip.borderWidth = 1;
+             Chart.defaults.plugins.tooltip.padding = 10;
+             Chart.defaults.plugins.tooltip.cornerRadius = 6;
+             Chart.defaults.plugins.tooltip.boxPadding = 4;
+
+             if (Chart.defaults.scale) {
+                 Chart.defaults.scale.grid.color = gridColor;
+                 Chart.defaults.scale.ticks.color = ticksColor;
+                 
+                 if (Chart.defaults.scale.title) {
+                    Chart.defaults.scale.title.color = titleColor;
+                 }
+             }
+             
+             // --- Update Existing Chart Instances --- 
+             if (consumptionChartInstance) {
+                 try {
+                      consumptionChartInstance.update();
+                      console.log('Consumption chart updated to reflect new defaults.');
+                 } catch (updateError) {
+                      console.error('Error updating consumption chart after defaults change:', updateError);
+                 }
+             }
+             
+             if (reportChartInstance) {
+                  try {
+                      reportChartInstance.update();
+                      console.log('Report chart updated to reflect new defaults.');
+                 } catch (updateError) {
+                      console.error('Error updating report chart after defaults change:', updateError);
+                 }
+             }
+         }
+
+        // Add listener to the theme switch
+        if (themeSwitch) {
+            themeSwitch.addEventListener('change', switchTheme);
+        } else {
+            console.error('Dark mode switch not found!');
+        }
+
+        // Apply initial theme BEFORE the rest of the script runs
+        applyInitialTheme(); 
+        
+        // --- Settings Tab Functions ---
+        
+        // Function to load user settings
+        async function loadUserSettings() {
+             console.log('Loading user settings...');
+             try {
+                 const { data: { user } } = await supabaseClient.auth.getUser();
+                 if (!user) throw new Error('User not logged in');
+
+                 const { data: settings, error } = await supabaseClient
+                     .from('user_settings')
+                     .select('alert_threshold, update_interval')
+                     .eq('user_id', user.id)
+                     .maybeSingle(); // Use maybeSingle to handle case where settings don't exist yet
+
+                 if (error) {
+                     console.error('Error fetching user settings:', error);
+                     throw error;
+                 }
+
+                 // Populate form with loaded settings or defaults
+                 const alertThresholdInput = document.getElementById('alertThreshold');
+                 const updateIntervalInput = document.getElementById('updateInterval');
+                 
+                 if (settings) {
+                     console.log('Found existing settings:', settings);
+                     if(alertThresholdInput) alertThresholdInput.value = settings.alert_threshold ?? 5.0; // Use default if null
+                     if(updateIntervalInput) updateIntervalInput.value = settings.update_interval ?? 5; // Use default if null
+                 } else {
+                     console.log('No existing settings found, using defaults.');
+                     // Populate with default values defined in the SQL or here
+                     if(alertThresholdInput) alertThresholdInput.value = 5.0;
+                     if(updateIntervalInput) updateIntervalInput.value = 5;
+                 }
+
+             } catch (error) {
+                 console.error('Failed to load user settings:', error);
+                 showToast('Error', 'Could not load user settings: ' + error.message, 'error');
+             }
+         }
+
+        // Function to handle saving user settings
+        async function handleSaveSettings(event) {
+             event.preventDefault(); // Prevent default form submission
+             console.log('Attempting to save settings...');
+
+             const alertThresholdInput = document.getElementById('alertThreshold');
+             const updateIntervalInput = document.getElementById('updateInterval');
+
+             const alertThreshold = parseFloat(alertThresholdInput.value);
+             const updateInterval = parseInt(updateIntervalInput.value, 10);
+
+             // Basic Validation
+             if (isNaN(alertThreshold) || alertThreshold < 0) {
+                 showToast('Invalid Input', 'Alert Threshold must be a non-negative number.', 'error');
+                 return;
+             }
+             if (isNaN(updateInterval) || updateInterval <= 0) {
+                  showToast('Invalid Input', 'Update Interval must be a positive integer (minutes).', 'error');
+                 return;
+             }
+             
+             const saveBtn = document.querySelector('#settingsForm button[type="submit"]');
+             const originalBtnText = saveBtn.textContent;
+             saveBtn.disabled = true;
+             saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Saving...';
+
+             try {
+                 const { data: { user } } = await supabaseClient.auth.getUser();
+                 if (!user) throw new Error('User not logged in');
+
+                 // Use upsert: inserts if no row with user_id exists, updates if it does.
+                 const { error } = await supabaseClient
+                     .from('user_settings')
+                     .upsert({
+                         user_id: user.id, // The primary key to match on
+                         alert_threshold: alertThreshold,
+                         update_interval: updateInterval,
+                         updated_at: new Date().toISOString() // Manually set updated_at for upsert
+                     });
+
+                 if (error) {
+                     console.error('Error saving settings:', error);
+                     throw error;
+                 }
+
+                 console.log('Settings saved successfully.');
+                 showToast('Settings Saved', 'Your settings have been updated.', 'success');
+
+             } catch (error) {
+                 console.error('Failed to save settings:', error);
+                 showToast('Error', 'Could not save settings: ' + error.message, 'error');
+             } finally {
+                 saveBtn.disabled = false;
+                 saveBtn.innerHTML = originalBtnText;
+             }
+         }
+
+        // Function to check user login status
+        async function checkUserLogin() {
+            console.log('Checking user login status...');
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (!session) {
+                    console.log('No active session found. Redirecting to login.');
+                    window.location.href = 'login.html';
+                } else {
+                    console.log('User session found:', session.user.id);
+                    // Load dashboard data AND user settings if logged in
+                    loadDashboardData();
+                    loadUserSettings();
+                    setupRealtimeSubscriptions();
+                }
+            } catch (error) {
+                console.error('Error checking user session:', error);
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Function to handle logout
+        async function handleLogout() {
+            console.log('Logout button clicked. Attempting to sign out...');
+            try {
+                const { error } = await supabaseClient.auth.signOut();
+                if (error) {
+                    console.error('Error signing out:', error);
+                    alert('Error signing out: ' + error.message);
+                } else {
+                    console.log('Successfully signed out. Redirecting to login.');
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Exception during sign out:', error);
+                alert('An error occurred during logout.');
+            }
+        }
+
+        // Function to load dashboard data with time range filtering
+        async function loadDashboardData(timeRange = 'day') {
+            try {
+                showStatus('Loading data...');
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                // Load all data in parallel
+                const [devicesResponse, readingsResponse, alertsResponse] = await Promise.all([
+                    supabaseClient.from('devices').select('*'), // Remove .catch()
+                    supabaseClient.from('readings').select('*').order('timestamp', { ascending: false }), // Remove .catch()
+                    supabaseClient.from('alerts').select('*').eq('status', 'active') // Remove .catch()
+                ]);
+
+                // Check for errors in responses AFTER Promise.all
+                if (devicesResponse.error) throw new Error('Failed to load devices: ' + devicesResponse.error.message);
+                if (readingsResponse.error) throw new Error('Failed to load readings: ' + readingsResponse.error.message);
+                if (alertsResponse.error) throw new Error('Failed to load alerts: ' + alertsResponse.error.message);
+
+                // Update UI components (data is now in .data property)
+                try {
+                    updateStatCards(devicesResponse.data, readingsResponse.data, alertsResponse.data);
+                } catch (error) {
+                    console.error('Error updating stat cards:', error);
+                }
+
+                try {
+                    updateConsumptionChart(readingsResponse.data, timeRange);
+                } catch (error) {
+                    console.error('Error updating consumption chart:', error);
+                }
+
+                try {
+                    updateRecentReadingsTable(readingsResponse.data);
+                } catch (error) {
+                    console.error('Error updating readings table:', error);
+                }
+
+                try {
+                    updateDevicesTable(devicesResponse.data);
+                } catch (error) {
+                    console.error('Error updating devices table:', error);
+                }
+
+                try {
+                    updateAlerts(alertsResponse.data);
+                } catch (error) {
+                    console.error('Error updating alerts:', error);
+                }
+
+                // Initialize card visibility and order
+                try {
+                    loadSavedConfiguration();
+                } catch (error) {
+                    console.error('Error loading saved configuration:', error);
+                }
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showToast('Error', 'Failed to load dashboard data: ' + error.message, 'danger');
+            } finally {
+                hideStatus();
+            }
+        }
+        
+        // Table pagination and sorting functionality
+        let currentPage = 1;
+        const itemsPerPage = 10;
+        let currentSortColumn = 'timestamp';
+        let currentSortDirection = 'desc';
+        let currentFilterText = '';
+        
+        function initTablePagination() {
+            // Set initial table data
+            renderTablePage();
+            
+            // Set up pagination controls
+            document.getElementById('prevPage').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (currentPage > 1) {
+                    currentPage--;
+                    renderTablePage();
+                }
+            });
+            
+            document.getElementById('nextPage').addEventListener('click', function(e) {
+                e.preventDefault();
+                const totalPages = Math.ceil(getFilteredReadings().length / itemsPerPage);
+                if (currentPage < totalPages) {
+                    currentPage++;
+                    renderTablePage();
+                }
+            });
+            
+            // Set up sortable headers
+            document.querySelectorAll('th.sortable').forEach(header => {
+                header.addEventListener('click', function() {
+                    const column = this.dataset.sort;
+                    if (currentSortColumn === column) {
+                        // Toggle direction if same column
+                        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        // New column, default to descending for timestamp, ascending for others
+                        currentSortColumn = column;
+                        currentSortDirection = column === 'timestamp' ? 'desc' : 'asc';
+                    }
+                    
+                    // Update header classes
+                    document.querySelectorAll('th.sortable').forEach(th => {
+                        th.classList.remove('sort-asc', 'sort-desc');
+                    });
+                    this.classList.add(currentSortDirection === 'asc' ? 'sort-asc' : 'sort-desc');
+                    
+                    // Reset to first page and render
+                    currentPage = 1;
+                    renderTablePage();
+                });
+            });
+            
+            // Set up search functionality
+            const searchInput = document.getElementById('readingsSearch');
+            const clearSearchBtn = document.getElementById('clearSearch');
+            
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    currentFilterText = this.value.toLowerCase();
+                    currentPage = 1; // Reset to first page
+                    renderTablePage();
+                });
+            }
+            
+            if (clearSearchBtn) {
+                clearSearchBtn.addEventListener('click', function() {
+                    searchInput.value = '';
+                    currentFilterText = '';
+                    currentPage = 1;
+                    renderTablePage();
+                });
+            }
+        }
+        
+        function getFilteredReadings() {
+            if (!window.allReadings) return [];
+            
+            // Apply text filter if any
+            let filtered = window.allReadings;
+            
+            if (currentFilterText) {
+                filtered = filtered.filter(reading => 
+                    reading.device.toLowerCase().includes(currentFilterText) ||
+                    reading.location.toLowerCase().includes(currentFilterText) ||
+                    reading.value.toString().includes(currentFilterText) ||
+                    new Date(reading.timestamp).toLocaleString().toLowerCase().includes(currentFilterText)
+                );
+            }
+            
+            // Apply sorting
+            filtered.sort((a, b) => {
+                let comparison = 0;
+                
+                switch (currentSortColumn) {
+                    case 'device':
+                        comparison = a.device.localeCompare(b.device);
+                        break;
+                    case 'location':
+                        comparison = a.location.localeCompare(b.location);
+                        break;
+                    case 'value':
+                        comparison = a.value - b.value;
+                        break;
+                    case 'timestamp':
+                    default:
+                        comparison = new Date(a.timestamp) - new Date(b.timestamp);
+                        break;
+                }
+                
+                return currentSortDirection === 'asc' ? comparison : -comparison;
+            });
+            
+            return filtered;
+        }
+        
+        function renderTablePage() {
+            const filteredReadings = getFilteredReadings();
+            const totalItems = filteredReadings.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            
+            // Adjust current page if needed
+            if (currentPage > totalPages) {
+                currentPage = totalPages || 1;
+            }
+            
+            // Calculate page items
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+            const pageItems = filteredReadings.slice(startIndex, endIndex);
+            
+            // --- ADDED NULL CHECKS for pagination info elements ---
+            const showingStartEl = document.getElementById('showingStart');
+            const showingEndEl = document.getElementById('showingEnd');
+            const totalEntriesEl = document.getElementById('totalEntries');
+            
+            // Update pagination info only if elements exist
+            if (showingStartEl) showingStartEl.textContent = totalItems ? startIndex + 1 : 0;
+            if (showingEndEl) showingEndEl.textContent = endIndex;
+            if (totalEntriesEl) totalEntriesEl.textContent = totalItems;
+            // --- END OF NULL CHECKS ---
+            
+            // Update pagination buttons
+            const prevPageLink = document.getElementById('prevPage');
+            const nextPageLink = document.getElementById('nextPage');
+            const prevBtn = prevPageLink ? prevPageLink.parentElement : null;
+            const nextBtn = nextPageLink ? nextPageLink.parentElement : null;
+            
+            if (prevBtn) prevBtn.classList.toggle('disabled', currentPage <= 1);
+            if (nextBtn) nextBtn.classList.toggle('disabled', currentPage >= totalPages);
+            
+            // Generate page links
+            const paginationUl = document.querySelector('.pagination');
+            if (paginationUl) { // Check if pagination container exists
+                let paginationHTML = `
+                    <li class="page-item ${currentPage <= 1 ? 'disabled' : ''}">
+                        <a class="page-link" href="#" id="prevPage"><i class="fas fa-chevron-left"></i></a>
+                    </li>
+                `;
+                
+                // Calculate which page numbers to show
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = startPage + maxVisiblePages - 1;
+                
+                if (endPage > totalPages) {
+                    endPage = totalPages;
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    paginationHTML += `
+                        <li class="page-item ${i === currentPage ? 'active' : ''}">
+                            <a class="page-link" href="#" data-page="${i}">${i}</a>
+                        </li>
+                    `;
+                }
+                
+                paginationHTML += `
+                    <li class="page-item ${currentPage >= totalPages ? 'disabled' : ''}">
+                        <a class="page-link" href="#" id="nextPage"><i class="fas fa-chevron-right"></i></a>
+                    </li>
+                `;
+                
+                paginationUl.innerHTML = paginationHTML;
+                
+                // Add click event listeners to page numbers
+                document.querySelectorAll('.page-link[data-page]').forEach(link => {
+                    link.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        currentPage = parseInt(this.dataset.page);
+                        renderTablePage();
+                    });
+                });
+                
+                // Re-add event listeners to prev/next buttons since we replaced the HTML
+                const newPrevPageLink = document.getElementById('prevPage');
+                const newNextPageLink = document.getElementById('nextPage');
+                if (newPrevPageLink) {
+                    newPrevPageLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (currentPage > 1) {
+                            currentPage--;
+                            renderTablePage();
+                        }
+                    });
+                }
+                if (newNextPageLink) {
+                    newNextPageLink.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        if (currentPage < totalPages) {
+                            currentPage++;
+                            renderTablePage();
+                        }
+                    });
+                }
+            } else {
+                console.warn("Pagination container (.pagination) not found.");
+            }
+            
+            // Render table rows
+            const recentReadingsBody = document.getElementById('recentReadings'); // Assuming this ID exists for tbody
+            if (!recentReadingsBody) {
+                console.error("Element with ID 'recentReadings' not found for table body.");
+                return;
+            }
+            
+            if (pageItems.length === 0) {
+                recentReadingsBody.innerHTML = `<tr><td colspan="5" class="text-center text-muted">No readings found${currentFilterText ? ' matching your search' : ''}.</td></tr>`; // Ensure colspan is 5
+                return;
+            }
+            
+            // Calculate high/low thresholds for highlighting
+            let values = filteredReadings.map(r => r.value);
+            let avg = values.length > 0 ? values.reduce((sum, val) => sum + val, 0) / values.length : 0;
+            let highThreshold = avg * 1.3; // 30% above average
+            let lowThreshold = avg * 0.7;  // 30% below average
+            
+            recentReadingsBody.innerHTML = '';
+            pageItems.forEach(reading => {
+                // Determine if value should be highlighted
+                let valueClass = '';
+                if (values.length > 1) { // Avoid highlighting if only one reading
+                    if (reading.value > highThreshold) {
+                        valueClass = 'value-high'; // Define these CSS classes if needed
+                    } else if (reading.value < lowThreshold) {
+                        valueClass = 'value-low'; // Define these CSS classes if needed
+                    }
+                }
+                
+                const formattedTimestamp = new Date(reading.timestamp).toLocaleString([], {
+                    year: 'numeric', month: 'short', day: 'numeric', 
+                    hour: 'numeric', minute: '2-digit' 
+                });
+                
+                // Make sure reading.device and reading.location exist
+                const deviceName = reading.device || 'N/A';
+                const locationName = reading.location || 'N/A';
+                const readingValue = reading.value !== undefined ? reading.value.toFixed(2) : 'N/A';
+                
+                const row = `
+                    <tr>
+                        <td>${deviceName}</td>
+                        <td>${locationName}</td>
+                        <td class="${valueClass}">${readingValue}</td>
+                        <td>${formattedTimestamp}</td>
+                    </tr>
+                `;
+                recentReadingsBody.innerHTML += row;
+            });
+        }
+
+        // Function to update Consumption Chart with testing.html-inspired styling
+        function updateConsumptionChart(labels, data) {
+            const chartCanvas = document.getElementById('consumptionChart');
+            
+            // Check if canvas element exists
+            if (!chartCanvas) {
+                console.warn('Consumption chart canvas not found');
+                return;
+            }
+            
+            console.log('Updating consumption chart with', data.length, 'data points');
+            
+            // Get theme-based colors
+            const isDark = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+            const textColor = isDark ? '#cbd5e1' : '#64748b';
+            
+            // Chart config
+            const config = {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'kWh Consumption',
+                        backgroundColor: 'rgba(108, 92, 231, 0.2)',
+                        borderColor: '#6C5CE7',
+                        data: data,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: data.length > 30 ? 0 : 3,
+                        pointHoverRadius: 5,
+                        pointBackgroundColor: '#FFFFFF',
+                        pointHoverBackgroundColor: '#6C5CE7',
+                        pointBorderColor: '#6C5CE7',
+                        pointHoverBorderColor: '#FFFFFF',
+                        pointBorderWidth: 2,
+                        pointHoverBorderWidth: 2,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            padding: 10,
+                            boxPadding: 5,
+                            caretPadding: 5,
+                            cornerRadius: 6,
+                            usePointStyle: true,
+                            backgroundColor: isDark ? '#334155' : 'rgba(255, 255, 255, 0.95)',
+                            titleColor: isDark ? '#f8fafc' : '#334155',
+                            bodyColor: isDark ? '#e2e8f0' : '#475569',
+                            borderColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
+                            borderWidth: 1,
+                            titleFont: {
+                                size: 13,
+                                weight: '600',
+                                family: "'Inter', sans-serif"
+                            },
+                            bodyFont: {
+                                size: 12,
+                                weight: '400',
+                                family: "'Inter', sans-serif"
+                            },
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    return tooltipItems[0].label;
+                                },
+                                label: function(context) {
+                                    return `  ${parseFloat(context.raw).toFixed(2)} kWh`;
+                                }
+                            }
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: true,
+                                color: gridColor,
+                                tickColor: gridColor
+                            },
+                            ticks: {
+                                color: textColor,
+                                maxRotation: 45,
+                                minRotation: 0,
+                                font: {
+                                    size: 10,
+                                    family: "'Inter', sans-serif"
+                                },
+                                maxTicksLimit: 10
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: true,
+                                color: gridColor,
+                                tickColor: gridColor
+                            },
+                            ticks: {
+                                color: textColor,
+                                font: {
+                                    size: 11,
+                                    family: "'Inter', sans-serif"
+                                },
+                                callback: function(value) {
+                                    return value + ' kWh';
+                                }
+                            },
+                            beginAtZero: true
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            };
+            
+            try {
+                // Check if we already have a chart instance and destroy it
+                if (consumptionChartInstance) {
+                    // Clear any previous data to prevent ghosting
+                    consumptionChartInstance.data.labels = [];
+                    consumptionChartInstance.data.datasets.forEach((dataset) => {
+                        dataset.data = [];
+                    });
+                    consumptionChartInstance.update();
+                    
+                    // Now update with new data
+                    consumptionChartInstance.data.labels = labels;
+                    consumptionChartInstance.data.datasets[0].data = data;
+                    consumptionChartInstance.options = config.options; // Update options in case theme changed
+                    consumptionChartInstance.update();
+                    console.log('Updated existing chart instance');
+                } else {
+                    // Create new chart instance
+                    console.log('Creating new consumption chart instance');
+                    consumptionChartInstance = new Chart(chartCanvas, config);
+                }
+            } catch (error) {
+                console.error('Error updating consumption chart:', error);
+                
+                // If update fails, try destroying and recreating the chart
+                try {
+                    if (consumptionChartInstance) {
+                        consumptionChartInstance.destroy();
+                    }
+                    consumptionChartInstance = new Chart(chartCanvas, config);
+                    console.log('Recreated consumption chart after error');
+                } catch (recreateError) {
+                    console.error('Failed to recreate chart after error:', recreateError);
+                    // Reset chart instance to null if recreation fails
+                    consumptionChartInstance = null;
+                }
+            }
+        }
+
+        // Function to load devices list for the Devices tab
+        async function loadDevicesList() {
+            console.log('Loading devices list...');
+            const devicesListBody = document.getElementById('devicesList');
+            if (!devicesListBody) {
+                 console.error('Devices list body element not found!');
+                 return; // Exit if the target element doesn't exist
+            }
+            // Show a temporary loading state in the table
+            devicesListBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted"><div class="spinner-border spinner-border-sm" role="status"></div> Loading devices...</td></tr>';
+            
+            try {
+                 const { data: { user } } = await supabaseClient.auth.getUser();
+                 if (!user) {
+                     console.warn('User not logged in, cannot load devices.');
+                      devicesListBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Please log in to view devices.</td></tr>';
+                      return;
+                 }
+                 
+                 console.log(`Fetching devices for user: ${user.id}`);
+                 
+                 // Select columns including the primary key 'id' (uuid) AND the text 'device_id'
+                 const { data: devices, error } = await supabaseClient
+                    .from('devices')
+                    .select('id, device_id, name, location, last_reading, created_at, calibration_factor') 
+                    .eq('user_id', user.id) // *** Ensure filtering by user ID ***
+                    .order('created_at', { ascending: true });
+
+                if (error) {
+                    console.error("Error fetching devices:", error); 
+                    devicesListBody.innerHTML = `<tr><td colspan="5" class="text-center text-danger">Error loading devices: ${error.message}</td></tr>`;
+                    throw error; // Rethrow to be caught below
+                }
+                
+                console.log(`Found ${devices ? devices.length : 0} devices.`);
+
+                devicesListBody.innerHTML = ''; // Clear previous data/loading state
+                
+                if (!devices || devices.length === 0) {
+                    devicesListBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No devices found. Add one using the button above!</td></tr>';
+                } else {
+                    devices.forEach(device => {
+                        const row = `
+                            <tr>
+                                <td>${device.device_id}</td>
+                                <td>${device.name || 'N/A'}</td>
+                                <td>${device.location || 'N/A'}</td>
+                                <td>${device.last_reading ? new Date(device.last_reading).toLocaleString() : 'N/A'}</td>
+                                <td> 
+                                    <button class="btn btn-sm btn-primary me-1" onclick="editDevice('${device.id}')"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-danger" onclick="deleteDevice('${device.id}')"><i class="fas fa-trash"></i></button>
+                                </td>
+                            </tr>
+                        `;
+                        devicesListBody.innerHTML += row;
+                    });
+                }
+            } catch(error) {
+                // General catch block (Supabase errors are handled above)
+                console.error('Error in loadDevicesList function:', error);
+                if (devicesListBody && !devicesListBody.querySelector('tr')) { // Avoid overwriting specific error messages
+                   devicesListBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">An unexpected error occurred loading devices.</td></tr>';
+                }
+            }
+        }
+
+        // Setup Realtime Subscriptions
+        function setupRealtimeSubscriptions() {
+            console.log('Setting up realtime subscriptions...');
+            
+            // --- Readings Subscription --- 
+            const readingsSubscription = supabaseClient
+                .channel('public:readings')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'readings' }, payload => {
+                    console.log('Change received on readings table:', payload);
+                    loadDashboardData(); // Reload dashboard data (which now includes device list reload)
+                })
+                .subscribe((status, err) => {
+                     if (err) {
+                         console.error('Error subscribing to readings:', err);
+                     } else {
+                         console.log('Successfully subscribed to readings changes. Status:', status);
+                     }
+                });
+                
+            // --- Devices Subscription --- 
+            const devicesSubscription = supabaseClient
+                .channel('public:devices')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'devices' }, payload => {
+                    console.log('Change received on devices table:', payload);
+                    // Reload BOTH dashboard summary data AND the specific devices list
+                    loadDashboardData(); 
+                    loadDevicesList(); // *** ADDED: Explicitly reload device list on device changes ***
+                })
+                .subscribe((status, err) => {
+                     if (err) {
+                         console.error('Error subscribing to devices:', err);
+                     } else {
+                         console.log('Successfully subscribed to devices changes. Status:', status);
+                     }
+                });
+                
+            // Optional: Clean up subscriptions on page unload
+            window.addEventListener('beforeunload', () => {
+                console.log('Removing Supabase subscriptions...');
+                supabaseClient.removeChannel(readingsSubscription);
+                supabaseClient.removeChannel(devicesSubscription);
+            });
+        }
+
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Dashboard DOM loaded.');
+            
+            // Attach time range filter button handlers
+            const timeFilterButtons = document.querySelectorAll('.time-filter button');
+            timeFilterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    timeFilterButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    // Load data with selected time range
+                    const timeRange = this.dataset.range;
+                    loadDashboardData(timeRange);
+                });
+            });
+            
+            // Rest of existing code...
+
+            // Attach logout handler
+            const logoutButton = document.getElementById('logoutBtn');
+            if (logoutButton) {
+                console.log('Logout button found. Attaching click listener.');
+                logoutButton.addEventListener('click', (e) => {
+                    e.preventDefault(); // Prevent default link behavior
+                    handleLogout();
+                });
+            } else {
+                console.error('Logout button not found!');
+            }
+
+            // Check user login status
+            checkUserLogin();
+
+            // Attach listener for the Save button in the Add Device modal
+            const saveDeviceButton = document.getElementById('saveNewDeviceBtn');
+            if (saveDeviceButton) {
+                saveDeviceButton.addEventListener('click', handleAddDevice);
+            } else {
+                console.error('Save New Device button not found!');
+            }
+
+             // Initialize modal instance listener (optional but good practice)
+             const addDeviceModalElement = document.getElementById('addDeviceModal');
+             if (addDeviceModalElement) {
+                 addDeviceModalElement.addEventListener('hidden.bs.modal', function () {
+                     // Reset form validation or button states if needed when modal closes
+                     const addForm = document.getElementById('addDeviceForm');
+                     if(addForm) addForm.reset();
+                     const saveBtn = document.getElementById('saveNewDeviceBtn');
+                     if(saveBtn) {
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = 'Save Device';
+                     }
+                 });
+             }
+
+            // Attach listener for the Copy button in the Confirmation modal
+            const copyButton = document.getElementById('copyDeviceIdBtn');
+            const generatedIdInput = document.getElementById('generatedDeviceId');
+            if (copyButton && generatedIdInput) {
+                copyButton.addEventListener('click', () => {
+                     copyToClipboard(generatedIdInput.value, copyButton);
+                });
+            } else {
+                 console.error('Copy button or generated ID input not found in confirmation modal!');
+            }
+
+            // Attach listener for the confirm delete button
+            const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.addEventListener('click', confirmDeleteDevice);
+            } else {
+                console.error('Confirm delete button not found!');
+            }
+
+            // Attach listener for the Update button in the Edit Device modal
+            const updateDeviceButton = document.getElementById('updateDeviceBtn');
+            if (updateDeviceButton) {
+                 updateDeviceButton.addEventListener('click', handleUpdateDevice);
+             } else {
+                 console.error('Update Device button not found!');
+             }
+
+             // Attach listener for the Settings form submission
+             const settingsForm = document.getElementById('settingsForm');
+             if (settingsForm) {
+                 settingsForm.addEventListener('submit', handleSaveSettings);
+             } else {
+                 console.error('Settings form not found!');
+             }
+
+            // Attach listener for the Generate Report button
+            const generateReportButton = document.querySelector('#reports button');
+            if (generateReportButton) {
+                // Make sure the onclick attribute is removed if it exists
+                generateReportButton.removeAttribute('onclick'); 
+                generateReportButton.addEventListener('click', generateReport);
+            } else {
+                console.error('Generate Report button not found!');
+            }
+        });
+
+        // Generate report
+        async function generateReport() {
+            console.log('Generating report...');
+            const startDateInput = document.getElementById('startDate');
+            const endDateInput = document.getElementById('endDate');
+            const generateBtn = document.querySelector('#reports button'); // Find button within reports tab
+
+            const startDate = startDateInput.value;
+            const endDate = endDateInput.value;
+
+            // Basic Validation
+            if (!startDate || !endDate) {
+                showToast('Missing Dates', 'Please select both start and end dates.', 'warning');
+                return;
+            }
+            if (new Date(startDate) > new Date(endDate)) {
+                showToast('Invalid Range', 'Start date cannot be after end date.', 'warning');
+                return;
+            }
+            
+            // Adjust end date to include the whole day (e.g., 2023-10-27 becomes 2023-10-27 23:59:59.999)
+            const endDateTime = new Date(endDate);
+            endDateTime.setHours(23, 59, 59, 999);
+            const adjustedEndDate = endDateTime.toISOString();
+
+            // Add loading state to button
+            const originalBtnText = generateBtn.innerHTML;
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Generating...';
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (!user) throw new Error('User not logged in');
+
+                console.log(`Fetching readings for user ${user.id} between ${startDate} and ${adjustedEndDate}`);
+
+                // Fetch readings within the date range for the user's devices
+                // We need to join with devices to filter by user_id
+                const { data: reportData, error } = await supabaseClient
+                    .from('readings')
+                    .select(`
+                        kwh_value,
+                        timestamp,
+                        devices!inner(user_id)
+                    `)
+                    .eq('devices.user_id', user.id) // Filter by user ID through the join
+                    .gte('timestamp', startDate)
+                    .lte('timestamp', adjustedEndDate)
+                    .order('timestamp', { ascending: true });
+
+                if (error) {
+                    console.error('Error fetching report data:', error);
+                    throw error;
+                }
+
+                if (!reportData || reportData.length === 0) {
+                    console.log('No data found for the selected range.');
+                    showToast('No Data', 'No readings found for the selected date range.', 'warning');
+                    // Optionally clear the previous chart
+                    if (reportChartInstance) {
+                        reportChartInstance.destroy();
+                        reportChartInstance = null; // Reset instance
+                    }
+                    // Or display a 'no data' message on the canvas?
+                    // const reportCtx = document.getElementById('reportChart').getContext('2d');
+                    // reportCtx.clearRect(0, 0, reportCtx.canvas.width, reportCtx.canvas.height);
+                    // reportCtx.fillText('No data available for this period', 10, 50); 
+                    return; // Stop processing if no data
+                }
+
+                console.log(`Found ${reportData.length} readings for the report.`);
+
+                // Prepare data for the chart
+                // Option 1: Show all individual readings (can be messy for long ranges)
+                // const labels = reportData.map(r => new Date(r.timestamp).toLocaleString());
+                // const dataValues = reportData.map(r => r.kwh_value);
+
+                // Option 2: Aggregate data by day (often more readable)
+                const dailyData = {}; // { 'YYYY-MM-DD': totalKwh }
+                reportData.forEach(r => {
+                    const day = r.timestamp.substring(0, 10); // Get YYYY-MM-DD part
+                    dailyData[day] = (dailyData[day] || 0) + r.kwh_value;
+                });
+                
+                const labels = Object.keys(dailyData).sort(); // Sort dates
+                const dataValues = labels.map(day => dailyData[day]);
+
+                // Update the report chart
+                updateReportChart(labels, dataValues);
+                showToast('Report Generated', `Report generated with ${reportData.length} readings.`, 'success');
+
+                // --- Explicitly update theme for chart AFTER data is loaded --- 
+                updateAllChartThemes();
+
+            } catch (error) {
+                console.error('Failed to generate report:', error);
+                showToast('Error', 'Could not generate report: ' + error.message, 'error');
+            } finally {
+                // Restore button state
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = originalBtnText;
+            }
+        }
+
+        // Function to update the Report Chart
+        function updateReportChart(labels, data) {
+            const reportCtx = document.getElementById('reportChart').getContext('2d');
+            if (reportChartInstance) {
+                reportChartInstance.destroy(); // Destroy previous instance if exists
+            }
+            reportChartInstance = new Chart(reportCtx, {
+                type: 'line', // Or 'bar' could be suitable for daily totals
+                data: {
+                    labels: labels, // Dates (or daily dates)
+                    datasets: [{
+                        label: 'Daily Power Consumption (kWh)', // Updated label
+                        data: data, // kWh values (or daily totals)
+                        borderColor: 'rgb(153, 102, 255)', // Different color
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)', // Optional fill color
+                        tension: 0.1,
+                        fill: true // Optional fill under the line
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allow chart to fill container height
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'kWh' }
+                        },
+                        x: {
+                            title: { display: true, text: 'Date' }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                             callbacks: {
+                                 label: function(context) {
+                                     let label = context.dataset.label || '';
+                                     if (label) {
+                                         label += ': ';
+                                     }
+                                     if (context.parsed.y !== null) {
+                                         label += context.parsed.y.toFixed(2) + ' kWh';
+                                     }
+                                     return label;
+                                 }
+                             }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to populate and show the Edit Device modal
+        async function editDevice(deviceIdUuid) {
+            console.log('Editing device with UUID:', deviceIdUuid);
+            try {
+                // Fetch the current device data
+                const { data: device, error } = await supabaseClient
+                    .from('devices')
+                    .select('id, device_id, name, location, calibration_factor') // Select fields needed for the form
+                    .eq('id', deviceIdUuid)
+                    .single(); // Expect one device
+
+                if (error) {
+                    console.error('Error fetching device details for edit:', error);
+                    alert('Failed to load device details: ' + error.message);
+                    return;
+                }
+
+                if (!device) {
+                    alert('Device not found.');
+                    return;
+                }
+
+                // Populate the modal form
+                document.getElementById('editDeviceIdInternal').value = device.id; // Store the internal UUID
+                document.getElementById('editDeviceIdText').value = device.device_id; // Display the text ID (readonly)
+                document.getElementById('editDeviceName').value = device.name || '';
+                document.getElementById('editDeviceLocation').value = device.location || '';
+                document.getElementById('editDeviceCalibration').value = device.calibration_factor || 1.0;
+
+                // Show the modal
+                const editModal = new bootstrap.Modal(document.getElementById('editDeviceModal'));
+                editModal.show();
+
+            } catch (error) {
+                console.error('Error in editDevice function:', error);
+                alert('An unexpected error occurred while trying to edit the device.');
+            }
+        }
+
+        // Function to handle the update (Save Changes button in Edit Modal)
+        async function handleUpdateDevice() {
+            const deviceUuid = document.getElementById('editDeviceIdInternal').value;
+            const name = document.getElementById('editDeviceName').value.trim();
+            const location = document.getElementById('editDeviceLocation').value.trim();
+            const calibrationFactor = parseFloat(document.getElementById('editDeviceCalibration').value);
+
+            // Validate required fields
+            if (!name) {
+                alert('Device Name cannot be empty.');
+                return;
+            }
+            if (isNaN(calibrationFactor)) {
+                 alert('Calibration Factor must be a valid number.');
+                 return;
+            }
+            if (!deviceUuid) {
+                alert('Error: Device internal ID is missing. Cannot update.');
+                return;
+            }
+
+            console.log(`Attempting to update device UUID: ${deviceUuid} with data:`, { name, location, calibrationFactor });
+
+            const updateBtn = document.getElementById('updateDeviceBtn');
+            updateBtn.disabled = true;
+            updateBtn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Updating...';
+
+            try {
+                const { error } = await supabaseClient
+                    .from('devices')
+                    .update({
+                        name: name,
+                        location: location,
+                        calibration_factor: calibrationFactor
+                        // NOTE: We are NOT updating device_id (text) here
+                    })
+                    .eq('id', deviceUuid); // Target the specific device by its internal UUID
+
+                if (error) {
+                    console.error('Supabase update error:', error);
+                    throw error; // Throw error to be handled below
+                } else {
+                    console.log('Device updated successfully');
+                    // Hide the modal
+                    const editModalEl = document.getElementById('editDeviceModal');
+                    const editModalInstance = bootstrap.Modal.getInstance(editModalEl);
+                    if(editModalInstance) editModalInstance.hide();
+                    
+                    // Refresh the device list
+                    loadDevicesList();
+                    // Optionally show a success message
+                    // alert('Device updated successfully!'); 
+                }
+
+            } catch (error) {
+                console.error('Error updating device:', error);
+                alert('Failed to update device: ' + (error.message || 'Unknown error'));
+            } finally {
+                updateBtn.disabled = false;
+                updateBtn.innerHTML = 'Save Changes';
+            }
+        }
+
+        // Function to handle deleting a device
+        function deleteDevice(deviceIdUuid) {
+            console.log('Preparing to delete device with UUID:', deviceIdUuid);
+            
+            // Get device details to show in confirmation
+            supabaseClient
+                .from('devices')
+                .select('name, device_id')
+                .eq('id', deviceIdUuid)
+                .single()
+                .then(({ data, error }) => {
+                    if (error) {
+                        console.error('Error fetching device details:', error);
+                        alert('Could not fetch device details for deletion.');
+                        return;
+                    }
+                    
+                    // Store the device ID in the modal
+                    document.getElementById('deleteDeviceId').value = deviceIdUuid;
+                    
+                    // Show the device name in the confirmation
+                    const deviceName = data.name || data.device_id || 'this device';
+                    document.getElementById('deleteDeviceName').textContent = deviceName;
+                    
+                    // Show the confirmation modal
+                    const deleteModal = new bootstrap.Modal(document.getElementById('deleteDeviceModal'));
+                    deleteModal.show();
+                });
+        }
+        
+        // Function to execute the device deletion
+        async function confirmDeleteDevice() {
+            const deviceIdUuid = document.getElementById('deleteDeviceId').value;
+            
+            if (!deviceIdUuid) {
+                alert('No device specified for deletion.');
+                return;
+            }
+            
+            // Show deleting status
+            showStatus('Deleting device...', 'loading');
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('devices')
+                    .delete()
+                    .eq('id', deviceIdUuid);
+
+                if (error) {
+                    console.error('Supabase delete error:', error);
+                    showStatus('Failed to delete device', 'error', 3000);
+                    throw error;
+                } else {
+                    console.log('Device deleted successfully');
+                    
+                    // Hide the modal
+                    const deleteModalEl = document.getElementById('deleteDeviceModal');
+                    const deleteModalInstance = bootstrap.Modal.getInstance(deleteModalEl);
+                    if(deleteModalInstance) deleteModalInstance.hide();
+                    
+                    // Show success message
+                    showStatus('Device deleted successfully', 'success', 2000);
+                    
+                    // Refresh the device list
+                    loadDevicesList();
+                }
+            } catch (error) {
+                console.error('Error deleting device:', error);
+                showStatus(`Failed to delete device: ${error.message || 'Unknown error'}`, 'error', 3000);
+            }
+        }
+
+        // Function to handle adding a new device
+        async function handleAddDevice() {
+            // Device ID input is removed, it will be generated by the trigger
+            const nameInputElement = document.getElementById('newDeviceName');
+            const name = nameInputElement ? nameInputElement.value.trim() : '';
+            
+            const locationInputElement = document.getElementById('newDeviceLocation');
+            const location = locationInputElement ? locationInputElement.value.trim() : '';
+            
+            const calibrationInputElement = document.getElementById('newDeviceCalibration');
+            const calibrationFactor = calibrationInputElement ? (parseFloat(calibrationInputElement.value) || 1.0) : 1.0;
+
+            // Only Name is strictly required from user input now
+            if (!name) { 
+                alert('Device Name is required and cannot be empty.');
+                if(nameInputElement) nameInputElement.focus();
+                return;
+            }
+            
+            // Log values being sent (excluding device_id)
+            console.log('Preparing to add device with user inputs:', { name, location, calibrationFactor });
+
+            // Disable button
+            const saveBtn = document.getElementById('saveNewDeviceBtn');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                 if (!user) throw new Error('User not logged in');
+
+                // Insert data - DO NOT include device_id, trigger will handle it
+                console.log('Sending insert request to Supabase (trigger will generate ID)...');
+                const { data, error } = await supabaseClient
+                    .from('devices')
+                    .insert([
+                        {
+                            // device_id is NOT sent here
+                            name: name,
+                            location: location,
+                            calibration_factor: calibrationFactor,
+                            user_id: user.id 
+                        }
+                    ])
+                    .select() // IMPORTANT: Select the newly inserted row to get the generated ID
+                    .single(); // Expecting a single row back
+
+                if (error) {
+                    console.error('Supabase insert error:', error);
+                     // Handle specific errors if needed (e.g., RLS issues)
+                     alert('Failed to add device. Error: ' + error.message);
+                     // throw error;
+                } else if (data && data.device_id) {
+                    // --- Success --- 
+                    const generatedDeviceId = data.device_id;
+                    console.log('Device added successfully! Generated ID:', generatedDeviceId);
+                    
+                    // Hide the Add modal
+                    const addModalElement = document.getElementById('addDeviceModal');
+                    const addModalInstance = bootstrap.Modal.getInstance(addModalElement);
+                    if(addModalInstance) addModalInstance.hide();
+                    
+                    // Show the confirmation modal
+                    document.getElementById('addedDeviceName').textContent = name; // Show device name
+                    const generatedIdInput = document.getElementById('generatedDeviceId');
+                    generatedIdInput.value = generatedDeviceId;
+                    
+                    const confirmationModalElement = document.getElementById('deviceAddedModal');
+                    const confirmationModal = new bootstrap.Modal(confirmationModalElement);
+                    confirmationModal.show();
+
+                    // Reset the Add form for next time
+                    const addForm = document.getElementById('addDeviceForm');
+                    if (addForm) addForm.reset();
+                    
+                    // Refresh device list in the background
+                    loadDevicesList();
+                    // loadDashboardData(); 
+                } else {
+                    // Handle case where insert succeeded but no data/ID was returned (shouldn't happen with .select().single())
+                    console.error('Device added but failed to retrieve generated ID.', data);
+                    alert('Device added, but could not retrieve the generated ID. Please check the Devices list.');
+                    loadDevicesList(); // Refresh list anyway
+                }
+            } catch (error) {
+                console.error('General error adding device:', error);
+                alert('Failed to add device: ' + (error.message || 'An unknown error occurred.'));
+            } finally {
+                // Re-enable button
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = 'Save Device';
+            }
+        }
+
+        // Function to copy text to clipboard
+        function copyToClipboard(text, buttonElement) {
+            navigator.clipboard.writeText(text).then(() => {
+                console.log('Device ID copied to clipboard:', text);
+                // Provide user feedback
+                const originalText = buttonElement.textContent;
+                buttonElement.textContent = 'Copied!';
+                setTimeout(() => {
+                    buttonElement.textContent = originalText;
+                }, 1500); // Reset after 1.5 seconds
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy ID. Please copy it manually.');
+            });
+        }
+
+        // Mobile sidebar toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const body = document.body;
+            
+            // Toggle sidebar on button click
+            sidebarToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sidebar.classList.toggle('show');
+                body.classList.toggle('sidebar-visible');
+            });
+            
+            // Close sidebar when clicking outside
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 992) {  // Mobile view only
+                    const clickedOutsideSidebar = !sidebar.contains(e.target) && !sidebarToggle.contains(e.target);
+                    
+                    if (clickedOutsideSidebar && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                        body.classList.remove('sidebar-visible');
+                    }
+                }
+            });
+            
+            // Close sidebar when window resizes to large screen
+            window.addEventListener('resize', function() {
+                if (window.innerWidth >= 992) {
+                    sidebar.classList.remove('show');
+                    body.classList.remove('sidebar-visible');
+                }
+            });
+            
+            // Add active class to nav links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Close sidebar on mobile after navigation
+                    if (window.innerWidth < 992) {
+                        sidebar.classList.remove('show');
+                        body.classList.remove('sidebar-visible');
+                    }
+                });
+            });
+        });
+
+        // Add Refresh Dashboard functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const refreshBtn = document.getElementById('refreshDashboardBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Refreshing...';
+                    
+                    showStatus('Refreshing dashboard data...', 'loading');
+                    
+                    // Get current active time range
+                    const activeTimeButton = document.querySelector('.time-filter button.active');
+                    const timeRange = activeTimeButton ? activeTimeButton.dataset.range : 'day';
+                    
+                    // Load dashboard data
+                    loadDashboardData(timeRange).finally(() => {
+                        this.disabled = false;
+                        this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                        
+                        // Status message is already handled in loadDashboardData
+                        // Show toast
+                        showToast('Dashboard Updated', 'Dashboard data has been refreshed.', 'success');
+                    });
+                });
+            }
+            
+            // ... Rest of your existing DOMContentLoaded code ...
+        });
+
+        // Ensure tabs work properly
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile sidebar toggle
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const sidebar = document.getElementById('sidebar');
+            const body = document.body;
+            
+            // Toggle sidebar on button click
+            sidebarToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                sidebar.classList.toggle('show');
+                body.classList.toggle('sidebar-visible');
+            });
+            
+            // Close sidebar when clicking outside
+            document.addEventListener('click', function(e) {
+                if (window.innerWidth < 992) {  // Mobile view only
+                    const clickedOutsideSidebar = !sidebar.contains(e.target) && !sidebarToggle.contains(e.target);
+                    
+                    if (clickedOutsideSidebar && sidebar.classList.contains('show')) {
+                        sidebar.classList.remove('show');
+                        body.classList.remove('sidebar-visible');
+                    }
+                }
+            });
+            
+            // Prevent clicks inside sidebar from closing it
+            sidebar.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+            
+            // Fix tab navigation
+            const navLinks = document.querySelectorAll('.nav-link[data-bs-toggle="tab"]');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    // Remove active class from all nav links
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    // Add active class to the clicked link
+                    this.classList.add('active');
+                    
+                    // Handle tab content manually to ensure proper switching
+                    const targetId = this.getAttribute('href').substring(1);
+                    const tabPanes = document.querySelectorAll('.tab-pane');
+                    
+                    // Hide all tab panes
+                    tabPanes.forEach(pane => {
+                        pane.classList.remove('show', 'active');
+                    });
+                    
+                    // Show the target tab pane
+                    const targetPane = document.getElementById(targetId);
+                    if (targetPane) {
+                        targetPane.classList.add('show', 'active');
+                    }
+                    
+                    // Close sidebar on mobile after navigation
+                    if (window.innerWidth < 992) {
+                        sidebar.classList.remove('show');
+                        body.classList.remove('sidebar-visible');
+                    }
+                    
+                    // If navigating to the reports tab, ensure the report chart is properly sized
+                    if (targetId === 'reports' && reportChartInstance) {
+                        setTimeout(() => {
+                            reportChartInstance.resize();
+                        }, 100);
+                    }
+                });
+            });
+        });
+        
+        // ... rest of your existing code ...
+    </script>
+
+    <!-- Add at the end of the body, before the closing </body> tag -->
+    <button class="fullscreen-mode-exit d-none" id="exitPresentationMode" aria-label="Exit presentation mode">
+        <i class="fas fa-compress" aria-hidden="true"></i>
+    </button>
+    
+    <!-- Bootstrap JS and Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Sortable.js for drag-and-drop functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.14.0/Sortable.min.js"></script>
+    
+    <!-- Additional JavaScript for new features -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            
+            // Sync dark mode toggles
+            const darkModeSwitch = document.getElementById('darkModeSwitch');
+            const darkModeSwitch2 = document.getElementById('darkModeSwitch2');
+            
+            if (darkModeSwitch && darkModeSwitch2) {
+                darkModeSwitch.addEventListener('change', function() {
+                    darkModeSwitch2.checked = darkModeSwitch.checked;
+                });
+                
+                darkModeSwitch2.addEventListener('change', function() {
+                    darkModeSwitch.checked = darkModeSwitch2.checked;
+                    darkModeSwitch.dispatchEvent(new Event('change'));
+                });
+            }
+            
+            // Presentation Mode
+            const presentationModeBtn = document.getElementById('presentationModeBtn');
+            const exitPresentationMode = document.getElementById('exitPresentationMode');
+            const mainContent = document.querySelector('.main-content');
+            const dashboardTab = document.getElementById('dashboard');
+            
+            if (presentationModeBtn && exitPresentationMode && mainContent) {
+                presentationModeBtn.addEventListener('click', function() {
+                    dashboardTab.classList.add('fullscreen-mode');
+                    exitPresentationMode.classList.remove('d-none');
+                    document.body.style.overflow = 'hidden';
+                });
+                
+                exitPresentationMode.addEventListener('click', function() {
+                    dashboardTab.classList.remove('fullscreen-mode');
+                    exitPresentationMode.classList.add('d-none');
+                    document.body.style.overflow = '';
+                });
+            }
+            
+            // Export functionality
+            const exportCSV = document.getElementById('exportCSV');
+            const exportPDF = document.getElementById('exportPDF');
+            const exportExcel = document.getElementById('exportExcel');
+            
+            if (exportCSV) {
+                exportCSV.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    exportData('csv');
+                });
+            }
+            
+            if (exportPDF) {
+                exportPDF.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    exportData('pdf');
+                });
+            }
+            
+            if (exportExcel) {
+                exportExcel.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    exportData('excel');
+                });
+            }
+            
+            function exportData(format) {
+                // This would be replaced with actual export logic in a production environment
+                alert(`Exporting data in ${format.toUpperCase()} format... (This is a demonstration)`);
+                console.log(`Export functionality would be implemented for ${format} format`);
+            }
+            
+            // Dashboard Customization
+            const customizeDashboardBtn = document.getElementById('customizeDashboardBtn');
+            const saveDashboardBtn = document.getElementById('saveDashboardBtn');
+            const resetDashboardBtn = document.getElementById('resetDashboardBtn');
+            const statCardsContainer = document.getElementById('statCardsContainer');
+            let sortableInstance = null;
+            
+            if (customizeDashboardBtn && saveDashboardBtn && resetDashboardBtn && statCardsContainer) {
+                // Initialize the visibility toggle functionality
+                function setupVisibilityToggles() {
+                    console.log("Setting up visibility toggles");
+                    
+                    const visibilityToggles = document.querySelectorAll('.card-visibility-toggle');
+                    console.log(`Found ${visibilityToggles.length} visibility toggles`);
+                    
+                    visibilityToggles.forEach((toggle, index) => {
+                        // Remove existing event listeners
+                        const newToggle = toggle.cloneNode(true);
+                        toggle.parentNode.replaceChild(newToggle, toggle);
+                        
+                        // Add new event listener
+                        newToggle.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            const cardContainer = this.closest('[data-card-id]');
+                            const card = this.closest('.card');
+                            const cardId = cardContainer.getAttribute('data-card-id');
+                            
+                            console.log(`Toggle clicked for card: ${cardId}`);
+                            
+                            // Toggle the hidden class
+                            card.classList.toggle('card-hidden');
+                            
+                            // Update the container's hidden-card class
+                            cardContainer.classList.toggle('hidden-card', card.classList.contains('card-hidden'));
+                            
+                            // Update the eye icon
+                            const icon = this.querySelector('i');
+                            if (card.classList.contains('card-hidden')) {
+                                icon.classList.remove('fa-eye');
+                                icon.classList.add('fa-eye-slash');
+                                console.log(`Card ${cardId} marked as hidden`);
+                            } else {
+                                icon.classList.remove('fa-eye-slash');
+                                icon.classList.add('fa-eye');
+                                console.log(`Card ${cardId} marked as visible`);
+                            }
+                        });
+                    });
+                }
+                
+                customizeDashboardBtn.addEventListener('click', function() {
+                    console.log("Entering customize mode");
+                    
+                    // Enter customization mode
+                    statCardsContainer.classList.add('card-customize-visible');
+                    customizeDashboardBtn.classList.add('d-none');
+                    saveDashboardBtn.classList.remove('d-none');
+                    resetDashboardBtn.classList.remove('d-none');
+                    
+                    // CRITICAL FIX: First get ALL cards based on saved config
+                    const savedConfig = localStorage.getItem('dashboardConfig');
+                    const defaultOrder = ['total-kwh', 'active-devices', 'avg-consumption', 'active-alerts'];
+                    
+                    // First ensure all cards exist in the DOM
+                    if (savedConfig) {
+                        try {
+                            console.log("Restoring hidden cards for customization");
+                            const config = JSON.parse(savedConfig);
+                            
+                            // Find any cards that might be missing completely from the DOM
+                            defaultOrder.forEach(cardId => {
+                                // Check if this card exists in the DOM
+                                let cardContainer = document.querySelector(`[data-card-id="${cardId}"]`);
+                                
+                                // If card doesn't exist in DOM but has a config entry or is a default card
+                                if (!cardContainer) {
+                                    console.log(`Card ${cardId} missing from DOM, restoring it`);
+                                    
+                                    // Create new card container based on cardId
+                                    cardContainer = createCardElement(cardId);
+                                    if (cardContainer) {
+                                        // Append to container
+                                        statCardsContainer.appendChild(cardContainer);
+                                    }
+                                }
+                            });
+                        } catch (e) {
+                            console.error("Error restoring hidden cards:", e);
+                        }
+                    }
+                    
+                    // Now make all card containers visible during customization mode
+                    const allCardContainers = document.querySelectorAll('[data-card-id]');
+                    
+                    console.log(`Found ${allCardContainers.length} cards to show in customize mode`);
+                    
+                    allCardContainers.forEach(container => {
+                        // Force display block on all containers in customize mode
+                        container.style.display = 'block';
+                        container.classList.remove('d-none');
+                        
+                        const card = container.querySelector('.card');
+                        const icon = container.querySelector('.card-visibility-toggle i');
+                        
+                        if (card && icon) {
+                            if (card.classList.contains('card-hidden')) {
+                                // Mark as hidden but still visible in customize mode
+                                icon.classList.remove('fa-eye');
+                                icon.classList.add('fa-eye-slash');
+                                container.classList.add('hidden-card');
+                                console.log(`Card ${container.getAttribute('data-card-id')} is hidden, showing with eye-slash icon`);
+                            } else {
+                                icon.classList.remove('fa-eye-slash');
+                                icon.classList.add('fa-eye');
+                                container.classList.remove('hidden-card');
+                                console.log(`Card ${container.getAttribute('data-card-id')} is visible`);
+                            }
+                        }
+                    });
+                    
+                    // Set up visibility toggles
+                    setupVisibilityToggles();
+                    
+                    // Initialize Sortable.js for drag and drop functionality
+                    if (!sortableInstance) {
+                        sortableInstance = new Sortable(statCardsContainer, {
+                            animation: 150,
+                            handle: '.card-drag-handle',
+                            ghostClass: 'sortable-ghost',
+                            chosenClass: 'sortable-chosen',
+                            dragClass: 'sortable-drag',
+                            onEnd: function(evt) {
+                                console.log('Card reordered:', 
+                                    evt.item.getAttribute('data-card-id'), 
+                                    'from', evt.oldIndex, 
+                                    'to', evt.newIndex
+                                );
+                            }
+                        });
+                    }
+                });
+                
+                saveDashboardBtn.addEventListener('click', function() {
+                    console.log("Saving dashboard configuration");
+                    
+                    // Exit customization mode
+                    statCardsContainer.classList.remove('card-customize-visible');
+                    customizeDashboardBtn.classList.remove('d-none');
+                    saveDashboardBtn.classList.add('d-none');
+                    resetDashboardBtn.classList.add('d-none');
+                    
+                    // Save configuration
+                    const config = {};
+                    const cardContainers = statCardsContainer.querySelectorAll('[data-card-id]');
+                    
+                    cardContainers.forEach((cardContainer, index) => {
+                        const cardId = cardContainer.getAttribute('data-card-id');
+                        const card = cardContainer.querySelector('.card');
+                        const isHidden = card.classList.contains('card-hidden');
+                        
+                        console.log(`Card ${cardId} - Hidden: ${isHidden}`);
+                        
+                        config[cardId] = {
+                            order: index,
+                            visible: !isHidden
+                        };
+                        
+                        // Apply visibility to the card container (not just the card)
+                        if (isHidden) {
+                            console.log(`Hiding card ${cardId}`);
+                            cardContainer.style.display = 'none';
+                            // Use opacity for a smoother transition
+                            cardContainer.style.opacity = '0';
+                        } else {
+                            console.log(`Showing card ${cardId}`);
+                            cardContainer.style.display = '';
+                            cardContainer.style.opacity = '1';
+                        }
+                    });
+                    
+                    console.log('Dashboard configuration saved:', config);
+                    localStorage.setItem('dashboardConfig', JSON.stringify(config));
+                    
+                    // Count visible cards and adjust column width
+                    adjustCardWidths();
+                    
+                    // Show confirmation
+                    showToast('Success', 'Dashboard layout saved successfully!', 'success');
+                });
+                
+                resetDashboardBtn.addEventListener('click', function() {
+                    // Reset to default
+                    statCardsContainer.classList.remove('card-customize-visible');
+                    customizeDashboardBtn.classList.remove('d-none');
+                    saveDashboardBtn.classList.add('d-none');
+                    resetDashboardBtn.classList.add('d-none');
+                    
+                    // Remove any custom ordering or visibility settings
+                    const cards = statCardsContainer.querySelectorAll('.card');
+                    cards.forEach(card => {
+                        card.classList.remove('card-hidden');
+                        const icon = card.querySelector('.card-visibility-toggle i');
+                        if (icon) {
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
+                    });
+                    
+                    // Reset the column width for all cards to default
+                    const cardContainers = statCardsContainer.querySelectorAll('.col-md-3');
+                    cardContainers.forEach(container => {
+                        container.className = 'col-md-3 col-sm-6';
+                    });
+                    
+                    // Reset the order of cards
+                    resetCardOrder();
+                    
+                    // Clear saved configuration
+                    localStorage.removeItem('dashboardConfig');
+                    
+                    // Show confirmation
+                    showToast('Success', 'Dashboard layout has been reset to default!', 'success');
+                });
+                
+                function resetCardOrder() {
+                    // Default order of cards
+                    const defaultOrder = ['total-kwh', 'active-devices', 'avg-consumption', 'active-alerts'];
+                    const container = document.getElementById('statCardsContainer');
+                    
+                    // Get all cards
+                    const cards = {};
+                    container.querySelectorAll('.col-md-3').forEach(card => {
+                        const cardId = card.getAttribute('data-card-id');
+                        cards[cardId] = card;
+                    });
+                    
+                    // Clear container
+                    container.innerHTML = '';
+                    
+                    // Append cards in default order
+                    defaultOrder.forEach(cardId => {
+                        if (cards[cardId]) {
+                            container.appendChild(cards[cardId]);
+                        }
+                    });
+                }
+                
+                // Load saved configuration if exists
+                function loadSavedConfiguration() {
+                    const savedConfig = localStorage.getItem('dashboardConfig');
+                    const container = document.getElementById('statCardsContainer');
+                    const defaultOrder = ['total-kwh', 'active-devices', 'avg-consumption', 'active-alerts'];
+
+                    if (!container) {
+                        console.error('Stat cards container not found!');
+                        return;
+                    }
+
+                    // --- Reset state before applying config ---
+                    const allCardContainers = container.querySelectorAll('[data-card-id]');
+                    allCardContainers.forEach(card => {
+                        card.style.display = ''; // Make sure all are initially visible
+                        card.classList.remove('hidden-card');
+                        const cardInner = card.querySelector('.card');
+                        if (cardInner) cardInner.classList.remove('card-hidden');
+                        const icon = card.querySelector('.card-visibility-toggle i');
+                         if (icon) {
+                             icon.classList.remove('fa-eye-slash');
+                             icon.classList.add('fa-eye');
+                         }
+                    });
+                    // Reset order to default initially
+                    const cardsMap = {};
+                    allCardContainers.forEach(card => {
+                        cardsMap[card.getAttribute('data-card-id')] = card;
+                        card.remove(); // Remove temporarily
+                    });
+                    defaultOrder.forEach(cardId => {
+                        if (cardsMap[cardId]) {
+                            container.appendChild(cardsMap[cardId]);
+                        }
+                    });
+                     // --- End Reset State --- 
+
+                    if (savedConfig) {
+                        try {
+                            console.log("Loading saved dashboard configuration");
+                            const config = JSON.parse(savedConfig);
+                            const cardsInDom = {};
+                            container.querySelectorAll('[data-card-id]').forEach(card => {
+                                cardsInDom[card.getAttribute('data-card-id')] = card;
+                                card.remove(); // Remove again before ordered insertion
+                            });
+
+                            const orderedIds = Object.keys(config).sort((a, b) => 
+                                (config[a]?.order ?? 99) - (config[b]?.order ?? 99) // Handle potential missing order
+                            );
+
+                            console.log(`Ordered card IDs from config: ${orderedIds.join(', ')}`);
+
+                            orderedIds.forEach(cardId => {
+                                const cardConfig = config[cardId];
+                                const cardElement = cardsInDom[cardId];
+
+                                if (cardElement && cardConfig) {
+                                    // Apply visibility from config
+                                    if (!cardConfig.visible) {
+                                        cardElement.style.display = 'none';
+                                        cardElement.classList.add('hidden-card');
+                                        const cardInner = cardElement.querySelector('.card');
+                                        if (cardInner) cardInner.classList.add('card-hidden');
+                                        const icon = cardElement.querySelector('.card-visibility-toggle i');
+                                        if (icon) {
+                                            icon.classList.remove('fa-eye');
+                                            icon.classList.add('fa-eye-slash');
+                                        }
+                                        console.log(`Hiding card ${cardId} based on config`);
+                                    } else {
+                                        // Ensure card is visible (redundant after reset, but safe)
+                                         cardElement.style.display = ''; 
+                                         cardElement.classList.remove('hidden-card');
+                                         const cardInner = cardElement.querySelector('.card');
+                                         if (cardInner) cardInner.classList.remove('card-hidden');
+                                         const icon = cardElement.querySelector('.card-visibility-toggle i');
+                                         if (icon) {
+                                             icon.classList.remove('fa-eye-slash');
+                                             icon.classList.add('fa-eye');
+                                         }
+                                    }
+                                    // Append in saved order
+                                    container.appendChild(cardElement);
+                                    console.log(`Appended card ${cardId} in order ${cardConfig.order}`);
+                                } else {
+                                     console.warn(`Card ${cardId} found in config but not in DOM, or config invalid.`);
+                                }
+                            });
+                            
+                            // Add any default cards that were not in the saved config (e.g., newly added cards)
+                            defaultOrder.forEach(cardId => {
+                                if (!orderedIds.includes(cardId) && cardsInDom[cardId]) {
+                                    console.log(`Appending default card ${cardId} not found in saved config.`);
+                                    cardsInDom[cardId].style.display = ''; // Ensure visible by default
+                                    cardsInDom[cardId].classList.remove('hidden-card');
+                                     const cardInner = cardsInDom[cardId].querySelector('.card');
+                                     if (cardInner) cardInner.classList.remove('card-hidden');
+                                      const icon = cardsInDom[cardId].querySelector('.card-visibility-toggle i');
+                                      if (icon) {
+                                           icon.classList.remove('fa-eye-slash');
+                                           icon.classList.add('fa-eye');
+                                       }
+                                    container.appendChild(cardsInDom[cardId]);
+                                }
+                            });
+
+                            console.log('Dashboard configuration loaded and applied');
+                        } catch (e) {
+                            console.error('Error loading/parsing dashboard configuration:', e);
+                             // If parsing fails, ensure default state (all visible, default order)
+                             // The reset logic at the start should handle this.
+                        }
+                    } else {
+                        console.log("No saved dashboard configuration found, using default layout.");
+                         // Ensure default state is applied if no config found
+                         // The reset logic at the start handles this.
+                    }
+                    
+                    // Adjust widths after applying config
+                    adjustCardWidths();
+                }
+
+                // Load saved configuration within DOMContentLoaded
+                loadSavedConfiguration(); 
+            }
+            
+            // Toast notification helper
+            function showToast(title, message, type = 'success') {
+                // Create toast container if it doesn't exist
+                let toastContainer = document.querySelector('.toast-container');
+                if (!toastContainer) {
+                    toastContainer = document.createElement('div');
+                    toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                    document.body.appendChild(toastContainer);
+                }
+                
+                // Create toast element
+                const toastId = 'toast-' + Date.now();
+                const toastEl = document.createElement('div');
+                toastEl.className = `toast align-items-center text-white bg-${type} border-0`;
+                toastEl.setAttribute('role', 'alert');
+                toastEl.setAttribute('aria-live', 'assertive');
+                toastEl.setAttribute('aria-atomic', 'true');
+                toastEl.setAttribute('id', toastId);
+                
+                // Set toast content
+                toastEl.innerHTML = `
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            <strong>${title}</strong>: ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                `;
+                
+                // Add toast to container
+                toastContainer.appendChild(toastEl);
+                
+                // Initialize and show toast
+                const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+                toast.show();
+                
+                // Remove toast after it's hidden
+                toastEl.addEventListener('hidden.bs.toast', function() {
+                    toastEl.remove();
+                });
+            }
+
+            // Function to adjust card widths based on visible cards
+            function adjustCardWidths() {
+                const allCardContainers = statCardsContainer.querySelectorAll('[data-card-id]');
+                const visibleCardContainers = Array.from(allCardContainers).filter(container => 
+                    !container.querySelector('.card').classList.contains('card-hidden')
+                );
+                
+                // Reset all to default first
+                allCardContainers.forEach(container => {
+                    container.className = container.classList.contains('hidden-card') 
+                        ? 'col-md-3 col-sm-6 hidden-card' 
+                        : 'col-md-3 col-sm-6';
+                });
+                
+                // Apply new widths based on visible count
+                const visibleCount = visibleCardContainers.length;
+                let newClass = 'col-md-3 col-sm-6'; // Default: 4 cards per row
+                
+                if (visibleCount === 3) {
+                    newClass = 'col-md-4 col-sm-6'; // 3 cards per row
+                } else if (visibleCount === 2) {
+                    newClass = 'col-md-6 col-sm-6'; // 2 cards per row
+                } else if (visibleCount === 1) {
+                    newClass = 'col-md-12 col-sm-12'; // 1 card takes full width
+                }
+                
+                // Apply new classes to visible cards
+                visibleCardContainers.forEach(container => {
+                    container.className = newClass;
+                });
+                
+                console.log(`Adjusted layout for ${visibleCount} visible cards`);
+            }
+        });
+
+        // Helper function to create a card element based on its ID
+        function createCardElement(cardId) {
+            console.log(`Creating card element for ${cardId}`);
+            
+            let iconClass, labelText, iconColor;
+            
+            switch(cardId) {
+                case 'total-kwh':
+                    iconClass = 'fa-bolt';
+                    labelText = 'TOTAL KWH';
+                    iconColor = 'icon-primary';
+                    break;
+                case 'active-devices':
+                    iconClass = 'fa-plug';
+                    labelText = 'ACTIVE DEVICES';
+                    iconColor = 'icon-secondary';
+                    break;
+                case 'avg-consumption':
+                    iconClass = 'fa-chart-line';
+                    labelText = 'AVG. CONSUMPTION';
+                    iconColor = 'icon-info';
+                    break;
+                case 'active-alerts':
+                    iconClass = 'fa-exclamation-triangle';
+                    labelText = 'ACTIVE ALERTS';
+                    iconColor = 'icon-accent';
+                    break;
+                default:
+                    return null; // Unknown card type
+            }
+            
+            // Create container element
+            const containerDiv = document.createElement('div');
+            containerDiv.className = 'col-md-3 col-sm-6';
+            containerDiv.setAttribute('data-card-id', cardId);
+            
+            // Create card HTML
+            containerDiv.innerHTML = `
+                <div class="card h-100 position-relative card-hidden">
+                    <div class="card-drag-handle"><i class="fas fa-grip-horizontal" aria-hidden="true"></i></div>
+                    <div class="card-visibility-toggle">
+                        <i class="fas fa-eye-slash" aria-hidden="true"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div class="icon-wrapper ${iconColor}">
+                            <i class="fas ${iconClass}" aria-hidden="true"></i>
+                        </div>
+                        <div class="value" id="${cardId.replace(/-/g, '')}">0</div>
+                        <div class="label">
+                            ${labelText}
+                            <i class="fas fa-info-circle ms-1 text-muted small" data-bs-toggle="tooltip" title="Information about ${labelText}"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Add hidden-card class to the container
+            containerDiv.classList.add('hidden-card');
+            
+            return containerDiv;
+        }
+
+        // Initialize dashboard cards visibility and order when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Main DOMContentLoaded listener executing...');
+            let sortableInstance = null; // Deklarasi di scope utama listener
+
+            // Initialize tooltips first
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+            console.log('Tooltips initialized.');
+
+            // Apply theme
+            applyInitialTheme(); 
+            console.log('Theme applied.');
+
+            // Load saved card configuration AFTER a very short delay
+            setTimeout(() => {
+                console.log('Executing loadSavedConfiguration after short delay...');
+                loadSavedConfiguration(); 
+            }, 50); // Delay 50ms
+
+            // ----- Definisi Fungsi Helper untuk Kustomisasi -----
+            function setupVisibilityToggles() {
+                 const statCardsContainer = document.getElementById('statCardsContainer');
+                 if (!statCardsContainer) return;
+                 console.log("Setting up visibility toggles");
+                 const visibilityToggles = statCardsContainer.querySelectorAll('.card-visibility-toggle'); 
+                 console.log(`Found ${visibilityToggles.length} visibility toggles`);
+                 visibilityToggles.forEach(toggle => {
+                     const newToggle = toggle.cloneNode(true);
+                     toggle.parentNode.replaceChild(newToggle, toggle);
+                     newToggle.addEventListener('click', function(e) {
+                         e.preventDefault();
+                         e.stopPropagation();
+                         const cardContainer = this.closest('[data-card-id]');
+                         const card = this.closest('.card');
+                         if(!cardContainer || !card) return;
+                         const cardId = cardContainer.getAttribute('data-card-id');
+                         card.classList.toggle('card-hidden');
+                         cardContainer.classList.toggle('hidden-card', card.classList.contains('card-hidden'));
+                         const icon = this.querySelector('i');
+                         if (!icon) return;
+                         if (card.classList.contains('card-hidden')) {
+                             icon.classList.remove('fa-eye');
+                             icon.classList.add('fa-eye-slash');
+                             console.log(`Card ${cardId} marked hidden`);
+                         } else {
+                             icon.classList.remove('fa-eye-slash');
+                             icon.classList.add('fa-eye');
+                              console.log(`Card ${cardId} marked visible`);
+                         }
+                     });
+                 });
+             }
+             
+             function resetCardOrder() {
+                 const defaultOrder = ['total-kwh', 'active-devices', 'avg-consumption', 'active-alerts'];
+                 const container = document.getElementById('statCardsContainer');
+                 if(!container) return;
+                 const cards = {};
+                 container.querySelectorAll('[data-card-id]').forEach(card => {
+                     const cardId = card.getAttribute('data-card-id');
+                     cards[cardId] = card;
+                 });
+                 container.innerHTML = ''; // Clear container
+                 defaultOrder.forEach(cardId => {
+                     if (cards[cardId]) {
+                         container.appendChild(cards[cardId]);
+                     }
+                 });
+                 console.log('Card order reset to default.');
+             }
+             // ----- Akhir Definisi Fungsi Helper -----
+
+            // Attach listeners for UI elements
+            // ... (Listener untuk logout, modals, copy, delete, settings, report) ...
+            
+            // ----- Listener untuk Kustomisasi Dashboard -----
+            const customizeDashboardBtn = document.getElementById('customizeDashboardBtn');
+            const saveDashboardBtn = document.getElementById('saveDashboardBtn'); // Pastikan ID ini ada di HTML
+            const resetDashboardBtn = document.getElementById('resetDashboardBtn');
+            const statCardsContainer = document.getElementById('statCardsContainer');
+
+            if (customizeDashboardBtn && saveDashboardBtn && resetDashboardBtn && statCardsContainer) {
+                
+                // Listener Tombol Customize
+                customizeDashboardBtn.addEventListener('click', function() {
+                    console.log("Entering customize mode");
+                    statCardsContainer.classList.add('card-customize-visible');
+                    customizeDashboardBtn.classList.add('d-none');
+                    saveDashboardBtn.classList.remove('d-none');
+                    resetDashboardBtn.classList.remove('d-none');
+
+                    // Pastikan semua kartu terlihat saat kustomisasi
+                    const allCardContainers = statCardsContainer.querySelectorAll('[data-card-id]');
+                    allCardContainers.forEach(container => {
+                        container.style.display = 'block'; // Paksa tampil
+                        const card = container.querySelector('.card');
+                        const icon = container.querySelector('.card-visibility-toggle i');
+                        if (card && icon) {
+                            // Set ikon berdasarkan status asli (card-hidden di card, bukan container)
+                            if (card.classList.contains('card-hidden')) {
+                                icon.classList.remove('fa-eye');
+                                icon.classList.add('fa-eye-slash');
+                            } else {
+                                icon.classList.remove('fa-eye-slash');
+                                icon.classList.add('fa-eye');
+                            }
+                        }
+                    });
+
+                    // Panggil setup toggles SETELAH memastikan semua kartu ada & terlihat
+                    setupVisibilityToggles(); 
+
+                    // Inisialisasi Sortable.js
+                    if (!sortableInstance && typeof Sortable !== 'undefined') {
+                        sortableInstance = new Sortable(statCardsContainer, {
+                            animation: 150,
+                            handle: '.card-drag-handle',
+                            ghostClass: 'sortable-ghost',
+                            chosenClass: 'sortable-chosen',
+                            dragClass: 'sortable-drag'
+                        });
+                        console.log('SortableJS initialized.');
+                    } else if(typeof Sortable === 'undefined') {
+                        console.error('Sortable.js library not loaded!');
+                    } else {
+                         console.log('SortableJS already initialized or library missing.');
+                    }
+                });
+
+                // Listener Tombol Save
+                saveDashboardBtn.addEventListener('click', function() {
+                    console.log("Saving dashboard configuration");
+                    statCardsContainer.classList.remove('card-customize-visible');
+                    customizeDashboardBtn.classList.remove('d-none');
+                    saveDashboardBtn.classList.add('d-none');
+                    resetDashboardBtn.classList.add('d-none');
+
+                    if (sortableInstance) {
+                        sortableInstance.destroy();
+                        sortableInstance = null;
+                        console.log('SortableJS destroyed.');
+                    }
+
+                    const config = {};
+                    const cardContainers = statCardsContainer.querySelectorAll('[data-card-id]');
+                    cardContainers.forEach((cardContainer, index) => {
+                        const cardId = cardContainer.getAttribute('data-card-id');
+                        const card = cardContainer.querySelector('.card');
+                        const isHidden = card ? card.classList.contains('card-hidden') : false; // Cek card sebelum akses classList
+                        config[cardId] = { order: index, visible: !isHidden };
+                        if (isHidden) {
+                            cardContainer.style.display = 'none';
+                            cardContainer.classList.add('hidden-card'); // Tambahkan juga ke container
+                        } else {
+                            cardContainer.style.display = '';
+                            cardContainer.classList.remove('hidden-card');
+                        }
+                    });
+                    localStorage.setItem('dashboardConfig', JSON.stringify(config));
+                    console.log('Configuration saved:', config);
+                    adjustCardWidths();
+                    showToast('Success', 'Dashboard layout saved successfully!', 'success');
+                });
+
+                // Listener Tombol Reset
+                resetDashboardBtn.addEventListener('click', function() {
+                    console.log("Resetting dashboard layout");
+                    statCardsContainer.classList.remove('card-customize-visible');
+                    customizeDashboardBtn.classList.remove('d-none');
+                    saveDashboardBtn.classList.add('d-none');
+                    resetDashboardBtn.classList.add('d-none');
+
+                    if (sortableInstance) {
+                        sortableInstance.destroy();
+                        sortableInstance = null;
+                        console.log('SortableJS destroyed.');
+                    }
+
+                    localStorage.removeItem('dashboardConfig');
+                    console.log('Removed saved config.');
+
+                    // Reset visual state untuk semua kartu
+                    const allCardContainers = statCardsContainer.querySelectorAll('[data-card-id]');
+                    allCardContainers.forEach(container => {
+                        container.style.display = '';
+                        container.classList.remove('hidden-card');
+                        const card = container.querySelector('.card');
+                        if(card) card.classList.remove('card-hidden');
+                        const icon = container.querySelector('.card-visibility-toggle i');
+                        if (icon) {
+                            icon.classList.remove('fa-eye-slash');
+                            icon.classList.add('fa-eye');
+                        }
+                        // Reset class kolom Bootstrap ke default (sesuaikan jika perlu)
+                        const cardId = container.getAttribute('data-card-id'); // Get ID before resetting class
+                        container.className = 'col-xl-3 col-lg-6 col-md-6 col-sm-12'; 
+                        container.setAttribute('data-card-id', cardId); // Set ID lagi
+                    });
+                    
+                    // Reset urutan DOM ke default
+                    resetCardOrder(); 
+                    
+                    adjustCardWidths(); // Sesuaikan lebar setelah reset
+                    showToast('Success', 'Dashboard layout has been reset to default!', 'success');
+                });
+
+            } else {
+                console.warn('Dashboard customization buttons or container not found.');
+            }
+            // ----- Akhir Listener Kustomisasi -----
+            
+            // ... (Listener lain seperti Time Range, Presentation, Export) ...
+
+            // Check user login status LAST
+            console.log('Checking user login...');
+            checkUserLogin(); 
+            console.log('Initial setup complete.');
+        });
+
+        // --- REMOVE OTHER DOMContentLoaded LISTENERS --- 
+
+        // Function to toggle card visibility
+        function toggleCardVisibility(event) {
+            // Find the closest parent card container
+            const cardContainer = event.target.closest('[data-card-id]');
+            if (!cardContainer) return;
+            
+            const cardId = cardContainer.getAttribute('data-card-id');
+            const isCurrentlyVisible = !cardContainer.classList.contains('hidden-card');
+            
+            // Toggle visibility
+            if (isCurrentlyVisible) {
+                cardContainer.classList.add('hidden-card');
+                cardContainer.style.display = 'none';
+            } else {
+                cardContainer.classList.remove('hidden-card');
+                cardContainer.style.display = '';
+            }
+            
+            // Save current state to localStorage
+            saveCurrentDashboardConfig();
+            
+            // Show status message
+            const statusMsg = isCurrentlyVisible ? 
+                `${cardId.replace('-', ' ')} card hidden` : 
+                `${cardId.replace('-', ' ')} card shown`;
+            showStatus(statusMsg, 'info', 3000);
+        }
+
+        // Function to save the current dashboard configuration
+        function saveCurrentDashboardConfig() {
+            // Get all dashboard cards
+            const cardContainers = document.querySelectorAll('[data-card-id]');
+            
+            // Create config object
+            const dashboardConfig = {
+                visibilityStatus: {},
+                order: []
+            };
+            
+            // Build the configuration from the current DOM state
+            cardContainers.forEach(container => {
+                const cardId = container.getAttribute('data-card-id');
+                dashboardConfig.visibilityStatus[cardId] = container.classList.contains('hidden-card');
+                dashboardConfig.order.push(cardId);
+            });
+            
+            // Save to localStorage
+            localStorage.setItem('dashboardConfig', JSON.stringify(dashboardConfig));
+            console.log('Dashboard configuration saved:', dashboardConfig);
+        }
+
+        // Function to show status messages
+        function showStatus(message, type = 'info', duration = 3000) {
+            const statusContainer = document.getElementById('status-container');
+            if (!statusContainer) {
+                // Create status container if it doesn't exist
+                const container = document.createElement('div');
+                container.id = 'status-container';
+                container.style.position = 'fixed';
+                container.style.bottom = '20px';
+                container.style.right = '20px';
+                container.style.zIndex = '1050';
+                document.body.appendChild(container);
+            }
+            
+            // Create alert element
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type} alert-dismissible fade show`;
+            alert.role = 'alert';
+            alert.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            
+            // Add to container
+            document.getElementById('status-container').appendChild(alert);
+            
+            // Auto dismiss after duration
+            setTimeout(() => {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            }, duration);
+        }
+
+        // Add event listeners to all toggle visibility icons
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add the event listeners to toggle visibility icons
+            document.querySelectorAll('.toggle-visibility').forEach(icon => {
+                icon.addEventListener('click', toggleCardVisibility);
+            });
+        });
+
+        function showStatus(message) {
+            const statusElement = document.getElementById('statusMessage');
+            if (statusElement) {
+                statusElement.textContent = message;
+                statusElement.parentElement.classList.remove('d-none');
+            }
+        }
+
+        function hideStatus() {
+            const statusElement = document.getElementById('statusMessage');
+            if (statusElement) {
+                statusElement.parentElement.classList.add('d-none');
+            }
+        }
+
+        // Function to update stat cards
+        function updateStatCards(devices, readings, alerts) {
+            try { // Add try...catch
+                // Update total kWh
+                const totalKwh = readings.reduce((sum, reading) => sum + (reading.kwh_value || 0), 0);
+                const totalKwhEl = document.getElementById('totalkwh');
+                if (totalKwhEl) totalKwhEl.textContent = totalKwh.toFixed(2);
+                else console.warn('Element #totalkwh not found');
+
+                // Update active devices
+                // Note: Assuming devices have a status property. Adjust if needed.
+                const activeDevices = devices ? devices.filter(device => device.status === 'active').length : 0;
+                const activeDevicesEl = document.getElementById('activedevices');
+                if (activeDevicesEl) activeDevicesEl.textContent = activeDevices;
+                else console.warn('Element #activedevices not found');
+
+                // Update average consumption
+                const avgConsumption = readings && readings.length > 0 ? totalKwh / readings.length : 0;
+                const avgConsumptionEl = document.getElementById('avgconsumption');
+                if (avgConsumptionEl) avgConsumptionEl.textContent = avgConsumption.toFixed(2);
+                else console.warn('Element #avgconsumption not found');
+
+                // Update active alerts
+                const activeAlerts = alerts ? alerts.length : 0;
+                const activeAlertsEl = document.getElementById('activealerts');
+                if (activeAlertsEl) activeAlertsEl.textContent = activeAlerts;
+                else console.warn('Element #activealerts not found');
+            } catch (error) {
+                console.error("Error updating stat cards:", error);
+                // Optionally show a specific error to the user
+            }
+        }
+
+        // Function to update consumption chart
+        function updateConsumptionChart(readings, timeRange = 'day') {
+            try {
+                const ctx = document.getElementById('consumptionChart');
+                if (!ctx) {
+                    console.warn('Chart canvas element not found');
+                    return;
+                }
+
+                // Process data based on time range
+                const now = new Date();
+                let startTime;
+                switch(timeRange) {
+                    case 'week':
+                        startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                        break;
+                    case 'month':
+                        startTime = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                        break;
+                    default:
+                        startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                }
+
+                // Filter and sort readings
+                const filteredReadings = readings
+                    .filter(r => r && r.timestamp && new Date(r.timestamp) >= startTime)
+                    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+                // Prepare chart data
+                const labels = filteredReadings.map(r => {
+                    const date = new Date(r.timestamp);
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                });
+                const data = filteredReadings.map(r => r.kwh_value || 0);
+
+                // Destroy existing chart if it exists
+                if (window.consumptionChart instanceof Chart) {
+                    window.consumptionChart.destroy();
+                }
+
+                // Create new chart
+                window.consumptionChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Power Consumption (kWh)',
+                            data: data,
+                            borderColor: '#6C5CE7',
+                            backgroundColor: 'rgba(108, 92, 231, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'kWh'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Time'
+                                }
+                            }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error updating consumption chart:', error);
+                showToast('Error', 'Failed to update consumption chart', 'danger');
+            }
+        }
+
+        // Function to update recent readings table
+        function updateRecentReadingsTable(readings) {
+            try { // Add try...catch
+                const tbody = document.getElementById('recentReadings');
+                if (!tbody) {
+                    console.warn('Element #recentReadings not found for table body.');
+                    return;
+                }
+
+                if (!readings || readings.length === 0) {
+                     tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No recent readings found.</td></tr>';
+                     return;
+                }
+
+                // Sort readings by timestamp
+                const sortedReadings = [...readings].sort((a, b) =>
+                    new Date(b.timestamp) - new Date(a.timestamp)
+                );
+
+                // Update table (assuming device_name exists, adjust if needed)
+                tbody.innerHTML = sortedReadings.slice(0, 10).map(reading => {
+                    const deviceIdentifier = reading.device_name || reading.device_id || 'Unknown';
+                    return `
+                    <tr>
+                        <td title="${deviceIdentifier}">${deviceIdentifier}</td> <!-- Add title attribute -->
+                        <td>${reading.location || 'N/A'}</td>
+                        <td>${(reading.kwh_value || 0).toFixed(2)}</td>
+                        <td>${new Date(reading.timestamp).toLocaleString()}</td>
+                    </tr>
+                `}).join('');
+            } catch (error) {
+                console.error("Error updating recent readings table:", error);
+            }
+        }
+
+        // Function to update devices table
+        function updateDevicesTable(devices) {
+             try { // Add try...catch
+                const tbody = document.getElementById('devicesTableBody'); // Matches the corrected ID
+                if (!tbody) {
+                     console.warn('Element #devicesTableBody not found.');
+                     return;
+                }
+
+                if (!devices || devices.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No devices found.</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = devices.map(device => {
+                    const deviceIdText = device.device_id || 'N/A';
+                    return `
+                    <tr>
+                        <td title="${deviceIdText}">${deviceIdText}</td> <!-- Add title attribute -->
+                        <td>${device.name || 'N/A'}</td>
+                        <td>${device.location || 'N/A'}</td>
+                        <td>${device.last_reading ? new Date(device.last_reading).toLocaleString() : 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary me-1" onclick="editDevice('${device.id}')" title="Edit ${device.name || deviceIdText}"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-danger" onclick="deleteDevice('${device.id}')" title="Delete ${device.name || deviceIdText}"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `}).join('');
+            } catch (error) {
+                console.error("Error updating devices table:", error);
+            }
+        }
+
+        // Function to update alerts
+        function updateAlerts(alerts) {
+            try { // Add try...catch
+                const alertsContainer = document.getElementById('alertsContainer'); // Use alertsContainer ID
+                if (!alertsContainer) {
+                    console.warn('Element #alertsContainer not found.');
+                    return;
+                }
+
+                if (!alerts || alerts.length === 0) {
+                    alertsContainer.innerHTML = '<div class="alert alert-secondary text-center p-2">No active alerts.</div>';
+                    return;
+                }
+
+                alertsContainer.innerHTML = alerts.map(alert => `
+                    <div class="alert alert-${alert.severity || 'warning'} alert-dismissible fade show p-2 mb-2" role="alert">
+                         <small>
+                            <i class="fas fa-exclamation-triangle me-1"></i>
+                            <strong>${alert.title || 'Alert'}:</strong> ${alert.message || 'No details.'}
+                            <span class="text-muted ms-2">(${new Date(alert.created_at).toLocaleTimeString()})</span>
+                         </small>
+                         <button type="button" class="btn-close btn-sm p-2" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error("Error updating alerts list:", error);
+            }
+        }
+
+        // Function to load saved configuration
+        function loadSavedConfiguration() {
+            const savedConfig = localStorage.getItem('dashboardConfig');
+            if (!savedConfig) return;
+
+            try {
+                const config = JSON.parse(savedConfig);
+                const container = document.getElementById('statCardsContainer');
+                if (!container) return;
+
+                // Reset all cards to visible first
+                container.querySelectorAll('[data-card-id]').forEach(cardContainer => {
+                    const card = cardContainer.querySelector('.card');
+                    if (card) {
+                        card.classList.remove('card-hidden');
+                        cardContainer.classList.remove('hidden-card');
+                    }
+                });
+
+                // Apply saved configuration
+                Object.entries(config).forEach(([cardId, settings]) => {
+                    const cardContainer = container.querySelector(`[data-card-id="${cardId}"]`);
+                    if (!cardContainer) return;
+
+                    const card = cardContainer.querySelector('.card');
+                    if (!card) return;
+
+                    if (!settings.visible) {
+                        card.classList.add('card-hidden');
+                        cardContainer.classList.add('hidden-card');
+                    }
+
+                    // Update order
+                    if (settings.order !== undefined) {
+                        cardContainer.style.order = settings.order;
+                    }
+                });
+
+                // Adjust card widths after applying configuration
+                adjustCardWidths();
+            } catch (error) {
+                console.error('Error loading saved configuration:', error);
+            }
+        }
+
+        // Function to adjust card widths based on visible cards
+        function adjustCardWidths() {
+            const container = document.getElementById('statCardsContainer');
+            if (!container) return;
+
+            const visibleCards = container.querySelectorAll('[data-card-id]:not(.hidden-card)');
+            const count = visibleCards.length;
+
+            visibleCards.forEach(card => {
+                // Reset classes
+                card.className = 'col';
+                
+                // Add appropriate classes based on count
+                if (count === 1) {
+                    card.classList.add('col-12');
+                } else if (count === 2) {
+                    card.classList.add('col-md-6');
+                } else if (count === 3) {
+                    card.classList.add('col-md-4');
+                } else {
+                    card.classList.add('col-md-3');
+                }
+            });
+        }
+    </script>
+</body>
+</html> 

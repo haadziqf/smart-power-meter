@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading Smart Power Meter...</title>
+    <!-- Optional: Basic styling for loading message -->
+    <style>
+        body { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            font-family: sans-serif; 
+            background-color: #f0f0f0; 
+            color: #333;
+        }
+        .loader { 
+            font-size: 1.2em; 
+        }
+        /* Basic spinner */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #6C5CE7; /* Primary color */
+            animation: spin 1s ease infinite;
+            margin-bottom: 1rem;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .container {
+            text-align: center;
+        }
+    </style>
+    <!-- Supabase JS Library -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <div class="loader">Checking authentication...</div>
+    </div>
+
+    <script>
+        // --- Supabase Configuration ---
+        // PENTING: Ganti dengan URL dan Anon Key Supabase Anda
+        const supabaseUrl = 'https://juciywnevycylsnqnbmq.supabase.co'; 
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp1Y2l5d25ldnljeWxzbnFuYm1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU0NTY3NjAsImV4cCI6MjA2MTAzMjc2MH0.jam9COWAITe4d1bYSuIyIp7ii-3R8_SlKoTIO5lwwjQ'; 
+        
+        let supabaseClient = null;
+
+        // --- Initialize Supabase ---
+        try {
+            if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
+                supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
+                console.log("Gatekeeper: Supabase client initialized.");
+            } else {
+                throw new Error("Supabase library not loaded correctly.");
+            }
+        } catch (error) {
+            console.error("Gatekeeper: Failed to initialize Supabase:", error);
+            // Fallback: Redirect to login if initialization fails
+            // This might happen if CDN fails or keys are wrong
+             alert("Error initializing application. Redirecting to login.");
+            window.location.replace('login.html'); 
+        }
+
+        // --- Check Authentication and Redirect ---
+        async function checkAuthAndRedirect() {
+            console.log("Gatekeeper: Checking authentication session...");
+            
+            if (!supabaseClient) {
+                console.error("Gatekeeper: Supabase client not available for session check.");
+                 alert("Application error. Redirecting to login.");
+                window.location.replace('login.html'); // Fallback
+                return;
+            }
+
+            try {
+                const { data, error } = await supabaseClient.auth.getSession();
+
+                if (error) {
+                    console.error("Gatekeeper: Error getting session:", error.message);
+                    // Fallback on error: assume not logged in
+                    console.log("Gatekeeper: Redirecting to login.html due to session error.");
+                    window.location.replace('login.html');
+                } else if (data.session) {
+                    console.log("Gatekeeper: Active session found. User ID:", data.session.user.id);
+                    console.log("Gatekeeper: Redirecting to dashboard_mvp.html");
+                    // User is logged in
+                    window.location.replace('dashboard_mvp.html'); 
+                } else {
+                    console.log("Gatekeeper: No active session. Redirecting to login.html");
+                    // User is not logged in
+                    window.location.replace('login.html'); 
+                }
+            } catch (err) {
+                console.error("Gatekeeper: Exception during session check:", err);
+                // Fallback on unexpected error
+                 alert("An unexpected error occurred. Redirecting to login.");
+                window.location.replace('login.html');
+            }
+        }
+
+        // --- Run the check ---
+        // Ensure Supabase client is initialized before checking
+        if (supabaseClient) {
+            checkAuthAndRedirect();
+        } else {
+            // Handle the case where initialization failed earlier (though it should have redirected)
+             console.error("Gatekeeper: Cannot run check, Supabase client failed to initialize.");
+        }
+
+    </script>
+</body>
+</html> 

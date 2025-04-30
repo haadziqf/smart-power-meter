@@ -1,0 +1,15 @@
+{
+  "name": "iot-proxy",
+  "version": "1.0.0",
+  "main": "api/iot.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node api/iot.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.4",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "node-fetch": "^2.6.7"
+  }
+}

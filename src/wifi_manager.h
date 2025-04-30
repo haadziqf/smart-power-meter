@@ -88,6 +88,27 @@ public:
     bool addNetwork(const char* ssid, const char* password);
     bool removeNetwork(const char* ssid);
     String getNetworksList();
+
+    // Add these new public methods to access server functionality
+    void on(const String &uri, HTTPMethod method, std::function<void()> fn) {
+        server.on(uri, method, fn);
+    }
+
+    void send(int code, const String& content_type, const String& content) {
+        server.send(code, content_type, content);
+    }
+
+    void sendHeader(const String& name, const String& value) {
+        server.sendHeader(name, value);
+    }
+
+    bool hasArg(const String& name) {
+        return server.hasArg(name);
+    }
+
+    String arg(const String& name) {
+        return server.arg(name);
+    }
 };
 
 #endif // WIFI_MANAGER_H 
