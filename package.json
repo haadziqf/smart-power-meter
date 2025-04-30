@@ -1,9 +1,10 @@
 {
   "name": "iot-proxy",
   "version": "1.0.0",
-  "main": "api/iot.js",
-  "type": "commonjs",
+  "private": true,
   "scripts": {
+    "dev": "node api/iot.js",
+    "build": "echo 'No build step required'",
     "start": "node api/iot.js"
   },
   "dependencies": {
